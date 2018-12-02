@@ -122,10 +122,15 @@
     // 设置云列表的第一台设备未当前选中的设备
     DLCloudDeviceManager *cloudManager = [DLCloudDeviceManager sharedInstance];
     if (cloudManager.cloudDeviceList.count > 0) {
-        NSString *mac = cloudManager.cloudDeviceList.allKeys[0];
-        DLDevice *device = cloudManager.cloudDeviceList[mac];
-        self.device = device;
-        self.deviceListVC.selectDevice = self.device;
+        if (self.deviceListVC.selectDevice && [cloudManager.cloudDeviceList objectForKey:self.deviceListVC.selectDevice.mac]) {
+            // 当设备列表已有选中设备，且存在云端列表中，不需要重新设置
+        }
+        else {
+            NSString *mac = cloudManager.cloudDeviceList.allKeys[0];
+            DLDevice *device = cloudManager.cloudDeviceList[mac];
+            self.device = device;
+            self.deviceListVC.selectDevice = self.device;
+        }
     }
     else {
         // 没有设备则跳转到添加界面
