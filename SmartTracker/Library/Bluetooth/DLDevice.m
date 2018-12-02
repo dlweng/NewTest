@@ -13,6 +13,7 @@
 #import "DLDevice.h"
 #import "DLUUIDTool.h"
 #import "DLCentralManager.h"
+#import "DLCloudDeviceManager.h"
 
 // 设置离线的RSSI值
 #define offlineRSSI @(-120)
@@ -693,9 +694,7 @@
     // 2.获取最新位置与时间， 并保存
     _coordinate = common.currentLocation;
     _offlineTime = [common getCurrentTime];
-//    [common saveDeviceOfflineInfo:self];
-    // 3.上传设备的新位置并做掉线通知
-//    [[InCommon sharedInstance] uploadDeviceLocation:self];
+    [[DLCloudDeviceManager sharedInstance] updateOfflineInfoWithDevice:self];
     if ([self.lastData boolValueForKey:DisconnectAlertKey defaultValue:NO]) {
         if (oldOnline) { // 如果原来是在线状态，再去发送离线通知和声音，提高用户体验, 因为只有获取到服务才认为在线，连接与在线状态不等同
             // 关闭的断开连接通知，则不通知
