@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="InDeviceListCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="59.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="RSSI_6.png" translatesAutoresizingMaskIntoConstraints="NO" id="7or-9c-kQW" userLabel="rssiView.png">
+                        <rect key="frame" x="5" y="15" width="100" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="100" id="Weo-ko-gm9"/>
+                            <constraint firstAttribute="height" constant="30" id="gE3-56-hC0"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lily" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eec-Tj-d5Q">
+                        <rect key="frame" x="115" y="8.5" width="29" height="23"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SmartCard.png" translatesAutoresizingMaskIntoConstraints="NO" id="Yzj-qe-W8F" userLabel="cardView.png">
+                        <rect key="frame" x="26" y="8" width="58" height="44"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="58" id="Bqh-wn-qG7"/>
+                            <constraint firstAttribute="height" constant="44" id="kUo-Hd-9gz"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Last seen just now" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zfY-9c-UiS">
+                        <rect key="frame" x="115" y="33.5" width="149" height="18"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UCe-5T-RAX" userLabel="batteryBodyView">
+                        <rect key="frame" x="268" y="0.0" width="36" height="59.5"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="0.png" translatesAutoresizingMaskIntoConstraints="NO" id="u4K-zm-cHb">
+                                <rect key="frame" x="-16" y="22" width="36" height="15.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="36" id="5Wy-PJ-zSr"/>
+                                    <constraint firstAttribute="height" constant="15.300000000000001" id="VmL-GL-gpv"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="u4K-zm-cHb" secondAttribute="trailing" constant="16" id="Jzx-oM-tMC"/>
+                            <constraint firstAttribute="width" constant="36" id="ZvS-ex-wsz"/>
+                            <constraint firstItem="u4K-zm-cHb" firstAttribute="centerY" secondItem="UCe-5T-RAX" secondAttribute="centerY" id="giy-6R-LYT"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="7or-9c-kQW" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="43z-Nr-JWg"/>
+                    <constraint firstItem="eec-Tj-d5Q" firstAttribute="leading" secondItem="7or-9c-kQW" secondAttribute="trailing" constant="10" id="9g3-CT-bQA"/>
+                    <constraint firstItem="UCe-5T-RAX" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="L7o-va-Evp"/>
+                    <constraint firstItem="Yzj-qe-W8F" firstAttribute="centerY" secondItem="7or-9c-kQW" secondAttribute="centerY" id="Luj-g2-I01"/>
+                    <constraint firstItem="eec-Tj-d5Q" firstAttribute="centerY" secondItem="7or-9c-kQW" secondAttribute="centerY" constant="-10" id="Mju-4D-Xgq"/>
+                    <constraint firstItem="UCe-5T-RAX" firstAttribute="leading" secondItem="zfY-9c-UiS" secondAttribute="trailing" constant="4" id="NNG-Cj-WBz"/>
+                    <constraint firstAttribute="bottom" secondItem="UCe-5T-RAX" secondAttribute="bottom" id="VXK-AV-bIT"/>
+                    <constraint firstItem="Yzj-qe-W8F" firstAttribute="centerX" secondItem="7or-9c-kQW" secondAttribute="centerX" id="Xaf-9s-mWQ"/>
+                    <constraint firstItem="zfY-9c-UiS" firstAttribute="top" secondItem="eec-Tj-d5Q" secondAttribute="bottom" constant="2" id="asH-Vw-1EZ"/>
+                    <constraint firstAttribute="trailing" secondItem="UCe-5T-RAX" secondAttribute="trailing" constant="16" id="dqX-Fw-XlS"/>
+                    <constraint firstItem="zfY-9c-UiS" firstAttribute="leading" secondItem="7or-9c-kQW" secondAttribute="trailing" constant="10" id="gMi-EH-myi"/>
+                    <constraint firstItem="7or-9c-kQW" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="5" id="i8W-13-M5Y"/>
+                    <constraint firstItem="UCe-5T-RAX" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="lPQ-GD-0P0"/>
+                    <constraint firstAttribute="bottom" secondItem="UCe-5T-RAX" secondAttribute="bottom" id="qfJ-cA-LEG"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.33333333329999998" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="batteryImageView" destination="u4K-zm-cHb" id="hrI-bW-LTS"/>
+                <outlet property="cardView" destination="Yzj-qe-W8F" id="SWY-Go-R6A"/>
+                <outlet property="rssiView" destination="7or-9c-kQW" id="Meq-7A-F75"/>
+                <outlet property="timeLabel" destination="zfY-9c-UiS" id="vcQ-wd-Rfh"/>
+                <outlet property="titleLabel" destination="eec-Tj-d5Q" id="4HE-89-dte"/>
+            </connections>
+            <point key="canvasLocation" x="48" y="129.53523238380811"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="0.png" width="36" height="15"/>
+        <image name="RSSI_6.png" width="119" height="35"/>
+        <image name="SmartCard.png" width="36" height="26"/>
+    </resources>
+</document>

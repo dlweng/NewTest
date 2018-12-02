@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InDeviceListViewController">
+            <connections>
+                <outlet property="tableView" destination="Rog-QR-ccx" id="cWU-d7-bXJ"/>
+                <outlet property="upDownImage" destination="jhI-yt-Zoh" id="Enf-oQ-y53"/>
+                <outlet property="upDownView" destination="WFs-iN-ins" id="CfL-G6-Y2p"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Rog-QR-ccx">
+                    <rect key="frame" x="0.0" y="44" width="375" height="623"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="GNe-EC-Wh9"/>
+                        <outlet property="delegate" destination="-1" id="r5w-wT-eH8"/>
+                    </connections>
+                </tableView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WFs-iN-ins">
+                    <rect key="frame" x="137.5" y="0.0" width="100" height="30"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="up.png" translatesAutoresizingMaskIntoConstraints="NO" id="jhI-yt-Zoh">
+                            <rect key="frame" x="30" y="12" width="40" height="18"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="40" id="12Z-Go-WKe"/>
+                                <constraint firstAttribute="height" constant="18" id="WPk-Cq-2FL"/>
+                            </constraints>
+                        </imageView>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="Dgm-3K-BbL"/>
+                        <constraint firstAttribute="width" constant="100" id="ZI5-6h-zyJ"/>
+                        <constraint firstItem="jhI-yt-Zoh" firstAttribute="centerX" secondItem="WFs-iN-ins" secondAttribute="centerX" id="f9s-w7-NoJ"/>
+                        <constraint firstAttribute="bottom" secondItem="jhI-yt-Zoh" secondAttribute="bottom" id="u7H-lE-oEv"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="Rog-QR-ccx" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="17f-Mm-e8z"/>
+                <constraint firstItem="WFs-iN-ins" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="8JM-ix-Cm6"/>
+                <constraint firstItem="Rog-QR-ccx" firstAttribute="top" secondItem="WFs-iN-ins" secondAttribute="bottom" constant="14" id="Aq8-lV-Cfr"/>
+                <constraint firstItem="WFs-iN-ins" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Tsj-ex-6cR"/>
+                <constraint firstAttribute="trailing" secondItem="Rog-QR-ccx" secondAttribute="trailing" id="XKM-nO-mk3"/>
+                <constraint firstAttribute="bottom" secondItem="Rog-QR-ccx" secondAttribute="bottom" id="cLv-vZ-f92"/>
+            </constraints>
+            <point key="canvasLocation" x="53.600000000000001" y="82.3088455772114"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="up.png" width="29" height="14"/>
+    </resources>
+</document>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="xJy-G8-dXw">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--In Device Setting View Controller-->
+        <scene sceneID="GmJ-IA-TdS">
+            <objects>
+                <viewController id="xJy-G8-dXw" customClass="InDeviceSettingViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="ITc-WE-QIF"/>
+                        <viewControllerLayoutGuide type="bottom" id="7wA-5P-WDv"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="4iP-en-vff">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="QI3-Ex-Zai">
+                                <rect key="frame" x="0.0" y="28" width="375" height="639"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="xJy-G8-dXw" id="wB2-C3-LF5"/>
+                                    <outlet property="delegate" destination="xJy-G8-dXw" id="dVL-Gv-0Mo"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803915" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="7wA-5P-WDv" firstAttribute="top" secondItem="QI3-Ex-Zai" secondAttribute="bottom" id="80Q-2v-nIp"/>
+                            <constraint firstAttribute="trailing" secondItem="QI3-Ex-Zai" secondAttribute="trailing" id="KfH-Qk-QfS"/>
+                            <constraint firstItem="QI3-Ex-Zai" firstAttribute="top" secondItem="ITc-WE-QIF" secondAttribute="bottom" constant="8" id="Muo-ia-jvC"/>
+                            <constraint firstItem="QI3-Ex-Zai" firstAttribute="leading" secondItem="4iP-en-vff" secondAttribute="leading" id="VoY-ep-wVf"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="QI3-Ex-Zai" id="o14-vM-t7x"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qec-1T-I1Z" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="144.80000000000001" y="261.31934032983509"/>
+        </scene>
+    </scenes>
+</document>

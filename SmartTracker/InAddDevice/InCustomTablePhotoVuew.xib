@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InControlDeviceViewController">
+            <connections>
+                <outlet property="customTakePhotoView" destination="iN0-l3-epB" id="Qqp-A6-rko"/>
+                <outlet property="imageBodyView" destination="FyY-OP-Inc" id="Q4e-1L-qbq"/>
+                <outlet property="imageView" destination="5es-h9-K0W" id="APw-el-OSg"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qhp-PS-bd4">
+                    <rect key="frame" x="0.0" y="573" width="375" height="94"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="photoBackground.png" translatesAutoresizingMaskIntoConstraints="NO" id="kco-QY-0wc">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="94"/>
+                        </imageView>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aW3-49-ycy">
+                            <rect key="frame" x="20" y="34" width="35" height="26"/>
+                            <state key="normal" image="photoLibrary.png"/>
+                            <connections>
+                                <action selector="goPhotoLibrary" destination="-1" eventType="touchUpInside" id="7Or-Th-teP"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8g5-or-lxg">
+                            <rect key="frame" x="154" y="13.5" width="67" height="67"/>
+                            <state key="normal" image="photoGreenCamera.png"/>
+                            <connections>
+                                <action selector="takePhoto" destination="-1" eventType="touchUpInside" id="Nyf-0D-zIp"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9nQ-nR-bOl">
+                            <rect key="frame" x="320" y="34" width="35" height="26"/>
+                            <state key="normal" image="photoBack.png"/>
+                            <connections>
+                                <action selector="takePhotoBack" destination="-1" eventType="touchUpInside" id="DbM-ex-XxQ"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="kco-QY-0wc" firstAttribute="leading" secondItem="Qhp-PS-bd4" secondAttribute="leading" id="2HY-9e-Yjc"/>
+                        <constraint firstItem="kco-QY-0wc" firstAttribute="top" secondItem="Qhp-PS-bd4" secondAttribute="top" id="3Up-tq-eK3"/>
+                        <constraint firstItem="aW3-49-ycy" firstAttribute="leading" secondItem="Qhp-PS-bd4" secondAttribute="leading" constant="20" id="8Dq-i8-2PP"/>
+                        <constraint firstItem="8g5-or-lxg" firstAttribute="centerX" secondItem="Qhp-PS-bd4" secondAttribute="centerX" id="Er8-3I-69r"/>
+                        <constraint firstAttribute="bottom" secondItem="kco-QY-0wc" secondAttribute="bottom" id="HGU-BF-nxT"/>
+                        <constraint firstItem="aW3-49-ycy" firstAttribute="centerY" secondItem="Qhp-PS-bd4" secondAttribute="centerY" id="KS7-ic-j7N"/>
+                        <constraint firstAttribute="height" constant="94" id="Vbc-QI-1yu"/>
+                        <constraint firstAttribute="trailing" secondItem="kco-QY-0wc" secondAttribute="trailing" id="aRU-Ox-2US"/>
+                        <constraint firstItem="9nQ-nR-bOl" firstAttribute="centerY" secondItem="Qhp-PS-bd4" secondAttribute="centerY" id="qk8-xg-ILw"/>
+                        <constraint firstItem="8g5-or-lxg" firstAttribute="centerY" secondItem="Qhp-PS-bd4" secondAttribute="centerY" id="r9k-Dz-Rti"/>
+                        <constraint firstAttribute="trailing" secondItem="9nQ-nR-bOl" secondAttribute="trailing" constant="20" id="xTq-Ib-o5w"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FyY-OP-Inc" userLabel="ImageBodyView">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="573"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="5es-h9-K0W">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="573"/>
+                        </imageView>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="5es-h9-K0W" firstAttribute="leading" secondItem="FyY-OP-Inc" secondAttribute="leading" id="Bfn-uW-Uc6"/>
+                        <constraint firstItem="5es-h9-K0W" firstAttribute="top" secondItem="FyY-OP-Inc" secondAttribute="top" id="f72-Zh-fQW"/>
+                        <constraint firstAttribute="bottom" secondItem="5es-h9-K0W" secondAttribute="bottom" id="lqO-iN-zm9"/>
+                        <constraint firstAttribute="trailing" secondItem="5es-h9-K0W" secondAttribute="trailing" id="veV-lw-MF7"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LNK-wp-AoS">
+                    <rect key="frame" x="23" y="24" width="29" height="29"/>
+                    <state key="normal" image="photoShark.png"/>
+                    <connections>
+                        <action selector="setPhotoSharkLight" destination="-1" eventType="touchUpInside" id="ewu-WF-2tV"/>
+                    </connections>
+                </button>
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZGm-Fa-BFV">
+                    <rect key="frame" x="323" y="24" width="29" height="29"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="29" id="8Av-T8-O3y"/>
+                        <constraint firstAttribute="width" constant="29" id="yfG-6g-tGi"/>
+                    </constraints>
+                    <state key="normal" image="changeCamera.png"/>
+                    <connections>
+                        <action selector="changeCameraDirection" destination="-1" eventType="touchUpInside" id="ofq-tC-XIN"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="ZGm-Fa-BFV" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="24" id="6TC-tP-eGQ"/>
+                <constraint firstItem="FyY-OP-Inc" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="Ba0-8q-c1J"/>
+                <constraint firstItem="Qhp-PS-bd4" firstAttribute="top" secondItem="FyY-OP-Inc" secondAttribute="bottom" id="CBV-dq-cxV"/>
+                <constraint firstItem="LNK-wp-AoS" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="23" id="O8r-Qb-oUw"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="Qhp-PS-bd4" secondAttribute="bottom" id="Q0m-F7-Utr"/>
+                <constraint firstItem="LNK-wp-AoS" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="24" id="U1e-Au-Gnw"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Qhp-PS-bd4" secondAttribute="trailing" id="XyG-Or-a8R"/>
+                <constraint firstItem="FyY-OP-Inc" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="YyD-if-K4C"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="FyY-OP-Inc" secondAttribute="trailing" id="azH-zw-krQ"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="ZGm-Fa-BFV" secondAttribute="trailing" constant="23" id="cRe-U5-Cjd"/>
+                <constraint firstItem="Qhp-PS-bd4" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="m7E-Y5-tGj"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="changeCamera.png" width="29" height="29"/>
+        <image name="photoBack.png" width="35" height="26"/>
+        <image name="photoBackground.png" width="360" height="93"/>
+        <image name="photoGreenCamera.png" width="67" height="67"/>
+        <image name="photoLibrary.png" width="35" height="26"/>
+        <image name="photoShark.png" width="29" height="29"/>
+    </resources>
+</document>
