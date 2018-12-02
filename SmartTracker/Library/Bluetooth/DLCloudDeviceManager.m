@@ -194,6 +194,7 @@ static DLCloudDeviceManager *instance = nil;
             NSString *mac = [dic stringValueForKey:@"mac" defaultValue:@""];
             if ([mac isEqualToString:device.mac]) {
                 removeObj = dic;
+                break;
             }
         }
         if (removeObj) {
