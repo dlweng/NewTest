@@ -550,7 +550,11 @@
     if ([peripheral.identifier.UUIDString isEqualToString:self. peripheral.identifier.UUIDString]) {
         if (!_disConnect)
         {
-            // 只处理当前设备离线的情况
+            // 只处理被动断连的离线
+            // 删除和重连的时候才会做主动离线
+            // 删除的主动离线，在删除接口做了离线赋值
+            // 重连的主动离线本身就是被动断连触发的，由被动断连去做离线处理
+            // 获取服务超时的主动断连，由于还未被赋值为在线，不需要去重新赋值为离线
             if ([DLCentralManager sharedInstance].state == CBCentralManagerStatePoweredOn) {
                 //被动的掉线且蓝牙打开，去做重连
                 NSLog(@"设备连接被断开，去重连设备, mac = %@, 线程 = %@", self.mac, [NSThread currentThread]);
@@ -578,10 +582,6 @@
                 // 做离线处理
                 [self changeStatusToDisconnect];
             }
-        }
-        else {
-            // 只有删除设备，或者重连设备错误或者超时会去做主动断开设备；被动断开才会去做重连，这种情况已在重连前用定时器去判断离线，这里不需要再做一次
-            self.online = NO;
         }
     }
 }

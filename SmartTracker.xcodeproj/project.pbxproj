@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		190EDF0B21BB85090046DD87 /* changeCamera@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 190EDF0921BB85080046DD87 /* changeCamera@3x.png */; };
+		190EDF0C21BB85090046DD87 /* changeCamera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 190EDF0A21BB85090046DD87 /* changeCamera@2x.png */; };
 		19A4227D21AA7DA00001C063 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 19A4227C21AA7DA00001C063 /* AppDelegate.m */; };
 		19A4228521AA7DA10001C063 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19A4228421AA7DA10001C063 /* Assets.xcassets */; };
 		19A4228821AA7DA10001C063 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 19A4228621AA7DA10001C063 /* LaunchScreen.storyboard */; };
@@ -126,6 +128,7 @@
 		19BB9D6721B3836D003C8A53 /* photoBack@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D6321B3836D003C8A53 /* photoBack@2x.png */; };
 		19BB9D6A21B383B0003C8A53 /* photoGreenCamera@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D6821B383AF003C8A53 /* photoGreenCamera@3x.png */; };
 		19BB9D6B21B383B0003C8A53 /* photoGreenCamera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D6921B383B0003C8A53 /* photoGreenCamera@2x.png */; };
+		19E2E16B21B572010014A58D /* icon_location.png in Resources */ = {isa = PBXBuildFile; fileRef = 19E2E16A21B572000014A58D /* icon_location.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +149,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		190EDF0921BB85080046DD87 /* changeCamera@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "changeCamera@3x.png"; sourceTree = "<group>"; };
+		190EDF0A21BB85090046DD87 /* changeCamera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "changeCamera@2x.png"; sourceTree = "<group>"; };
 		19A4227821AA7DA00001C063 /* SmartTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19A4227B21AA7DA00001C063 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		19A4227C21AA7DA00001C063 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -290,6 +295,7 @@
 		19BB9D6321B3836D003C8A53 /* photoBack@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photoBack@2x.png"; sourceTree = "<group>"; };
 		19BB9D6821B383AF003C8A53 /* photoGreenCamera@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photoGreenCamera@3x.png"; sourceTree = "<group>"; };
 		19BB9D6921B383B0003C8A53 /* photoGreenCamera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photoGreenCamera@2x.png"; sourceTree = "<group>"; };
+		19E2E16A21B572000014A58D /* icon_location.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_location.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -401,6 +407,7 @@
 				19BB9D4D21B3754A003C8A53 /* annotation@3x.png */,
 				19BB9D4221B36EA0003C8A53 /* icon_add_device@2x.png */,
 				19BB9D4321B36EA0003C8A53 /* icon_add_device@3x.png */,
+				19E2E16A21B572000014A58D /* icon_location.png */,
 				19BB9D3D21B36E50003C8A53 /* down@2x.png */,
 				19BB9D3C21B36E50003C8A53 /* down@3x.png */,
 				19BB9D3B21B36E50003C8A53 /* up@2x.png */,
@@ -475,6 +482,8 @@
 				19BB9D6121B3836D003C8A53 /* photoBackground@3x.png */,
 				19BB9D6921B383B0003C8A53 /* photoGreenCamera@2x.png */,
 				19BB9D6821B383AF003C8A53 /* photoGreenCamera@3x.png */,
+				190EDF0A21BB85090046DD87 /* changeCamera@2x.png */,
+				190EDF0921BB85080046DD87 /* changeCamera@3x.png */,
 			);
 			path = image;
 			sourceTree = "<group>";
@@ -662,6 +671,7 @@
 				19BB9D5421B382EE003C8A53 /* uncheck@2x.png in Resources */,
 				19A4228821AA7DA10001C063 /* LaunchScreen.storyboard in Resources */,
 				19BB9D1421B36834003C8A53 /* 50@2x.png in Resources */,
+				19E2E16B21B572010014A58D /* icon_location.png in Resources */,
 				19A4232621AA9D980001C063 /* searchCardHolder@2x.png in Resources */,
 				19BB9D2F21B36944003C8A53 /* RSSI_5@3x.png in Resources */,
 				19A4231521AA97FF0001C063 /* failedCheck@2x.png in Resources */,
@@ -700,6 +710,7 @@
 				19A4231921AA97FF0001C063 /* searchImage@3x.png in Resources */,
 				19BB9D0E21B36834003C8A53 /* 20@3x.png in Resources */,
 				19BB9D1A21B36834003C8A53 /* 40@2x.png in Resources */,
+				190EDF0B21BB85090046DD87 /* changeCamera@3x.png in Resources */,
 				19BB9D1921B36834003C8A53 /* 90@3x.png in Resources */,
 				19BB9D3321B36944003C8A53 /* RSSI_6@2x.png in Resources */,
 				19BB9CC021B35C2F003C8A53 /* InControlDeviceViewController.xib in Resources */,
@@ -752,6 +763,7 @@
 				19BB9D1C21B36834003C8A53 /* 50@3x.png in Resources */,
 				19BB9D4521B36EA1003C8A53 /* icon_add_device@3x.png in Resources */,
 				19BB9D3721B36944003C8A53 /* RSSI_3@2x.png in Resources */,
+				190EDF0C21BB85090046DD87 /* changeCamera@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

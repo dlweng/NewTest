@@ -88,6 +88,7 @@ static DLCloudDeviceManager *instance = nil;
     [self removeDeviceByCloudList:device];
     [self.cloudDeviceList removeObjectForKey:mac];
     [device disConnectToDevice:nil]; // 默认断开连接都会成功
+    device.online = NO;
 }
 
 //根据新发现的设备更新云端列表
@@ -200,7 +201,10 @@ static DLCloudDeviceManager *instance = nil;
         if (removeObj) {
             [cloudList removeObject:removeObj];
         }
-        [defaults setValue:[cloudList copy] forKey:@"cloudDeviceList"];
+        NSLog(@"删除了设备：removeObj = %@", removeObj);
+        NSArray *newCloudList = [cloudList copy];
+        NSLog(@"新设备列表: cloudList = %@", newCloudList);
+        [defaults setValue:newCloudList forKey:@"cloudDeviceList"];
         [defaults synchronize];
     }
 }

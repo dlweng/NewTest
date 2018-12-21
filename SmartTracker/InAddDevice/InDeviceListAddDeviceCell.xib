@@ -19,14 +19,14 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_add_device.png" translatesAutoresizingMaskIntoConstraints="NO" id="Nna-9j-ZRz">
-                        <rect key="frame" x="42" y="12" width="20" height="20"/>
+                        <rect key="frame" x="50" y="12" width="20" height="20"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="20" id="8XE-p1-z3n"/>
                             <constraint firstAttribute="height" constant="20" id="Ujq-Lj-5bu"/>
                         </constraints>
                     </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Newly added smart devices" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MCK-jF-hll">
-                        <rect key="frame" x="70" y="11.5" width="212" height="21"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Add a new smart device" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MCK-jF-hll">
+                        <rect key="frame" x="78" y="11.5" width="183.5" height="21"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
@@ -35,7 +35,7 @@
                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="MCK-jF-hll" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="7za-J5-m0s"/>
-                    <constraint firstItem="Nna-9j-ZRz" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" constant="-108" id="DoX-gN-yOn"/>
+                    <constraint firstItem="Nna-9j-ZRz" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" constant="-100" id="DoX-gN-yOn"/>
                     <constraint firstItem="Nna-9j-ZRz" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="mMC-uX-NWK"/>
                     <constraint firstItem="MCK-jF-hll" firstAttribute="leading" secondItem="Nna-9j-ZRz" secondAttribute="trailing" constant="8" id="pYk-go-XOZ"/>
                 </constraints>

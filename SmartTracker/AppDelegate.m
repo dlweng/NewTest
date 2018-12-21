@@ -20,6 +20,9 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    // 启动图片延时: 1秒
+    [NSThread sleepForTimeInterval:0.5];
     // 设置状态栏
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
     
