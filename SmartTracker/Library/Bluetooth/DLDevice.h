@@ -27,7 +27,6 @@
 #define DeviceRSSIChangeNotification  @"DeviceRSSIChangeNotification"
 #define DeviceGetAckFailedNotification @"DeviceGetAckFailedNotification"
 
-
 @class DLDevice;
 @protocol DLDeviceDelegate
 // 设备信息变化通知
@@ -37,17 +36,18 @@
 // 云端设备类
 @interface DLDevice : NSObject<CBPeripheralDelegate>
 @property (nonatomic, weak) id<DLDeviceDelegate> delegate;
-// 标识设备是哪种类型的设备
-@property (nonatomic, assign) int type;
 @property (nonatomic, strong) CBPeripheral *peripheral;
+@property (nonatomic, assign) NSInteger cloudID;
 @property (nonatomic, copy) NSString *mac;
 @property (nonatomic, copy) NSString *deviceName;
 @property (nonatomic, strong) NSNumber *rssi;
 // 最新的设备数据
 @property (nonatomic, strong, readonly) NSDictionary *lastData;
 @property (nonatomic, assign) BOOL online; // 在线状态
-@property (nonatomic, assign, readonly) BOOL connected; // 连接状态
-
+@property (nonatomic, assign, readonly) BOOL connecting;
+@property (nonatomic, assign, readonly) BOOL connected; 
+// 标识设备是哪种类型的设备
+@property (nonatomic, assign) int type;
 // 保存离线时间信息：eg：离线30秒 offlineTimeInfo = Last seen 30 second ago
 @property (nonatomic, strong) NSString *offlineTimeInfo;
 // 保存设备离线的准确时间：eg: 1980-01-01 00:00:01
@@ -57,9 +57,12 @@
 @property (nonatomic, assign) BOOL isSearchPhone;
 // 标志手机是否正在查找设备
 @property (nonatomic, assign) BOOL isSearchDevice;
+@property (nonatomic, assign) BOOL isOfflineSounding; //标志是不是有断连警报
 // 标记是否正处于重连设备的状态， 设备离线倒计时重连的时候使用， 用这个来标记是否关闭后台任务
 // 由于设备处于后台，蓝牙报断连之后，如果10秒内没其他操作，进程会被挂起，重连超时的时间如果超过15秒，需要在重连开始时开启后台任务，保证定时器可以被执行。这个属性用于判断是否当前所有设备都已经重连完毕，重连完毕，就可以关闭后台任务
 @property (nonatomic, assign) BOOL isReconnectTimer;
+@property (nonatomic, assign) BOOL firstAdd; // 刚刚添加的设备，第一次连接要去发关闭断连通知
+@property (nonatomic, copy) NSString *firmware; //固件版本号
 
 + (instancetype)device:(CBPeripheral *)peripheral;
 
@@ -91,4 +94,5 @@
 // 开始查找设备定时器: 查找设备定时没接收到回复的情况下，关闭查找设备状态
 - (void)startSearchDeviceTimer;
 - (void)readRSSI;
+- (void)stopOfflineSound; //停止离线声音
 @end

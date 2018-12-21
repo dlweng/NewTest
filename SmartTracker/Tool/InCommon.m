@@ -8,13 +8,14 @@
 
 #import "InCommon.h"
 #import <AVFoundation/AVFoundation.h>
+#import "DLCloudDeviceManager.h"
 
-@interface InCommon ()<CLLocationManagerDelegate, AVAudioPlayerDelegate, AVAudioPlayerDelegate> {
+@interface InCommon ()<CLLocationManagerDelegate> {
     NSTimer *_sharkTimer; // 闪光灯计时器
 }
 @property (nonatomic, strong) CLLocationManager *locationManager;
-// 音频播放
-@property (nonatomic, strong) AVAudioPlayer *audioPlayer;
+@property (nonatomic, strong) CLBeaconRegion *iBeaconRegion;
+//@property (nonatomic, assign) UIBackgroundTaskIdentifier iBeaconBackgroundTaskID;
 @property (nonatomic, assign) UIBackgroundTaskIdentifier backgroundTaskID;
 @end
 
@@ -41,7 +42,7 @@
         // 设置闪光灯定时器
         _sharkTimer = [NSTimer timerWithTimeInterval:0.4 target:self selector:@selector(setupSharkLight) userInfo:nil repeats:YES];
         [[NSRunLoop currentRunLoop] addTimer:_sharkTimer forMode:NSRunLoopCommonModes];
-        [self stopSharkAnimation];
+        [_sharkTimer setFireDate:[NSDate distantFuture]];
     }
     return self;
 }
@@ -146,6 +147,7 @@
     } else if (status == kCLAuthorizationStatusAuthorizedWhenInUse) {
         NSLog(@"授权只允许在使用期间定位");
         [self setupLocationData];
+        [self startiBeaconListen];
     }
     else{
         NSLog(@"用户拒绝授权");
@@ -185,6 +187,83 @@
     }
     return NO;
 }
+
+#pragma mark - IBeacon 激活APP
+- (BOOL)isMonitoriBeacon {
+    CLAuthorizationStatus authorizationStatus = [CLLocationManager authorizationStatus];
+    if (authorizationStatus == kCLAuthorizationStatusAuthorizedAlways || authorizationStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
+        if ([CLLocationManager isMonitoringAvailableForClass:[CLBeaconRegion class]]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+- (void)startiBeaconListen {
+    if (![self isMonitoriBeacon]) {
+        NSLog(@"设备不可以使用iBeacon，去监听");
+        return;
+    }
+    NSLog(@"设备可以使用iBeacon，去监听");
+    [_locationManager startMonitoringForRegion:self.iBeaconRegion];
+}
+
+- (void)stopIbeaconListen {
+    if (![self isMonitoriBeacon]) {
+        return;
+    }
+    [_locationManager stopMonitoringForRegion:self.iBeaconRegion];
+}
+
+- (CLBeaconRegion *)iBeaconRegion {
+    if (!_iBeaconRegion) {
+        NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:@"704F6FEE-A8A0-475B-91C2-7A2ECC1CE8A2"];
+        _iBeaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID major:16 minor:17 identifier:@"com.innwaytech.innway"];
+        _iBeaconRegion.notifyOnEntry = YES;
+        _iBeaconRegion.notifyOnExit = YES;
+    }
+    return _iBeaconRegion;
+}
+
+- (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {
+    NSLog(@"开始监听ibeacon范围");
+    //    [InCommon sendLocalNotification:@"开始监听ibeacon范围"];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
+{
+    if(state == CLRegionStateInside)
+    {
+        NSLog(@"进入了iBeacon的范围");
+//        [self beginiBeaconBackgroundTask];
+        //        [InCommon sendLocalNotification:[NSString stringWithFormat:@"进入了iBeacon的范围"]];
+    }
+    else if(state == CLRegionStateOutside)
+    {
+        NSLog(@"退出了iBeacon的范围");
+//        [self beginiBeaconBackgroundTask];
+        //        [InCommon sendLocalNotification:[NSString stringWithFormat:@"退出了iBeacon的范围"]];
+    }
+}
+
+//- (void)beginiBeaconBackgroundTask {
+//    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+//        if (0 != self.iBeaconBackgroundTaskID) {
+//            return;
+//        }
+//        __weak typeof(self) weakSelf = self;
+//        self.iBeaconBackgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+//            [weakSelf stopiBeaconBackgroundTask];
+//        }];
+//    }
+//}
+//
+//- (void)stopiBeaconBackgroundTask {
+//    if (self.iBeaconBackgroundTaskID != 0) {
+//        NSInteger taskid = self.iBeaconBackgroundTaskID;
+//        self.iBeaconBackgroundTaskID = 0;
+//        [[UIApplication sharedApplication] endBackgroundTask:taskid];
+//    }
+//}
 
 #pragma mark - date
 //获取当前的时间 1980-01-01 00:00:01
@@ -308,66 +387,42 @@
     return isEnable;
 }
 
-#pragma mark - 手机报警
-- (void)playSoundAlertMusic {
-    NSNumber *phoneAlertMusic = [[NSUserDefaults standardUserDefaults] objectForKey:PhoneAlertMusicKey];
-    NSString *alertMusic;
-    switch (phoneAlertMusic.integerValue) {
-        case 2:
-            alertMusic = @"voice2.mp3";
-            break;
-        case 3:
-            alertMusic = @"voice3.mp3";
-            break;
-        default:
-            alertMusic = @"voice1.mp3";
-            break;
-    }
-    NSString *musicPath = [[NSBundle mainBundle] pathForResource:alertMusic ofType:nil];
-    NSURL *fileURL = [NSURL fileURLWithPath:musicPath];
-    NSLog(@"fileURL = %@", fileURL.absoluteString);
-    // 设置后台播放代码
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    // 这个进入后台10秒钟后播放没声音
-    //    [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
-    // 这个可以在后台播放
-    [audioSession setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
-    [audioSession setActive:YES error:nil];
-    NSError *error = nil;
-    self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&error];
-    self.audioPlayer.delegate = self;
-    self.audioPlayer.numberOfLoops = 1000;
-    self.audioPlayer.volume = 1.0;
-    [self.audioPlayer play];
-    [self startSharkAnimation];
-}
-
-- (void)stopSoundAlertMusic {
-    NSLog(@"停止查找手机的报警声音");
-    [self.audioPlayer stop];
-    [self stopSharkAnimation];
-}
-
-- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
-    NSLog(@"监听到音乐结束");
-}
-
-- (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player {
-    NSLog(@"监听到音乐开始被中断");
-}
-
-- (void)audioPlayerEndInterruption:(AVAudioPlayer *)player {
-    NSLog(@"监听到音乐中断结束");
-}
 
 #pragma mark - 闪光灯动画
 - (void)startSharkAnimation {
+    if (self.isSharkAnimationing) { //如果已经开始，断开
+        return;
+    }
+    self.isSharkAnimationing = YES; //标志已经打开了闪光灯动画
     [_sharkTimer setFireDate:[NSDate distantPast]];
 }
 
 - (void)stopSharkAnimation {
+    if (!self.isSharkAnimationing) {
+        return;
+    }
+    NSDictionary *deviceList = [[DLCloudDeviceManager sharedInstance].cloudDeviceList copy];
+    for (NSString *mac in deviceList.allKeys) {
+        DLDevice *device = deviceList[mac];
+        if (device.isSearchPhone) { //只要有一台设备正在查找手机，就不去关闭它
+            return;
+        }
+    }
+    self.isSharkAnimationing = NO;
     [_sharkTimer setFireDate:[NSDate distantFuture]];
     [self closeSharkLight];
+}
+
+- (void)closeSharkLight {
+    AVCaptureDevice *camera = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    //修改前必须先锁定
+    [camera lockForConfiguration:nil];
+    //必须判定是否有闪光灯，否则如果没有闪光灯会崩溃
+    if ([camera hasFlash]) {
+        camera.flashMode = AVCaptureFlashModeOff;
+        camera.torchMode = AVCaptureTorchModeOff;
+    }
+    [camera unlockForConfiguration];
 }
 
 - (void)setupSharkLight {
@@ -386,50 +441,6 @@
         
     }
     [camera unlockForConfiguration];
-}
-
-- (void)closeSharkLight {
-    AVCaptureDevice *camera = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    //修改前必须先锁定
-    [camera lockForConfiguration:nil];
-    //必须判定是否有闪光灯，否则如果没有闪光灯会崩溃
-    if ([camera hasFlash]) {
-        camera.flashMode = AVCaptureFlashModeOff;
-        camera.torchMode = AVCaptureTorchModeOff;
-    }
-    [camera unlockForConfiguration];
-}
-
-#pragma mark - 离线提示音
-- (void)playSound {
-    NSNumber *phoneAlertMusic = [[NSUserDefaults standardUserDefaults] objectForKey:PhoneAlertMusicKey];
-    NSString *alertMusic;
-    switch (phoneAlertMusic.integerValue) {
-        case 2:
-            alertMusic = @"voice2.mp3";
-            break;
-        case 3:
-            alertMusic = @"voice3.mp3";
-            break;
-        default:
-            alertMusic = @"voice1.mp3";
-            break;
-    }
-    NSString *musicPath = [[NSBundle mainBundle] pathForResource:alertMusic ofType:nil];
-    NSURL *fileURL = [NSURL fileURLWithPath:musicPath];
-    NSLog(@"fileURL = %@", fileURL.absoluteString);
-    // 设置后台播放代码
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    // 这个可以在后台播放
-    [audioSession setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
-    [audioSession setActive:YES error:nil];
-    NSError *error = nil;
-    self.audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&error];
-    self.audioPlayer.delegate = self;
-    self.audioPlayer.numberOfLoops = 0;
-//    self.audioPlayer.volume = 1.0;
-    [self.audioPlayer play];
-    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
 }
 
 #pragma mark - 获取RSSI对应的图片名称
@@ -481,6 +492,43 @@
     if([[UIApplication sharedApplication] canOpenURL:url]) {
         NSURL*url =[NSURL URLWithString:UIApplicationOpenSettingsURLString];
         [[UIApplication sharedApplication] openURL:url];
+    }
+}
+
+#pragma mark - 后台任务
+- (BOOL)beginBackgroundTask {
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+        if (0 != self.backgroundTaskID) {
+            return YES;
+        }
+        __weak typeof(self) weakSelf = self;
+        self.backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+            if (0 != weakSelf.backgroundTaskID) {
+                NSInteger taskid = weakSelf.backgroundTaskID;
+                weakSelf.backgroundTaskID = 0;
+                [[UIApplication sharedApplication] endBackgroundTask:taskid];
+            }
+        }];
+        return 0 != self.backgroundTaskID;
+    }
+    return NO;
+}
+
+- (void)endBackgrondTask {
+    NSDictionary *deviceList = [[DLCloudDeviceManager sharedInstance].cloudDeviceList copy];
+    for (NSString *mac in deviceList.allKeys) {
+        DLDevice *device = deviceList[mac];
+        if (device.isReconnectTimer) {
+            return; //只有一台设备在做重连就不去关闭后台任务;[DLCloudDeviceManager sharedInstance].cloudDeviceList
+        }
+    }
+    // 所有设备都重连计时完毕，去关闭后台任务
+    NSLog(@"所有设备都重连计时完毕，去关闭后台任务");
+    sleep(1);
+    if (0 != self.backgroundTaskID) {
+        NSInteger taskid = self.backgroundTaskID;
+        self.backgroundTaskID = 0;
+        [[UIApplication sharedApplication] endBackgroundTask:taskid];
     }
 }
 

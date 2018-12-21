@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		190EDF0B21BB85090046DD87 /* changeCamera@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 190EDF0921BB85080046DD87 /* changeCamera@3x.png */; };
 		190EDF0C21BB85090046DD87 /* changeCamera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 190EDF0A21BB85090046DD87 /* changeCamera@2x.png */; };
+		1965914821CCB9300060525D /* DLDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 1965914421CCB92F0060525D /* DLDevice.m */; };
+		1965914921CCB9300060525D /* DLCentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1965914521CCB92F0060525D /* DLCentralManager.m */; };
+		1965914C21CCB9B50060525D /* NSTimer+InTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1965914A21CCB9B50060525D /* NSTimer+InTimer.m */; };
 		19A4227D21AA7DA00001C063 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 19A4227C21AA7DA00001C063 /* AppDelegate.m */; };
 		19A4228521AA7DA10001C063 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 19A4228421AA7DA10001C063 /* Assets.xcassets */; };
 		19A4228821AA7DA10001C063 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 19A4228621AA7DA10001C063 /* LaunchScreen.storyboard */; };
@@ -41,8 +44,6 @@
 		19A4232A21AA9F830001C063 /* successCheck@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19A4232821AA9F830001C063 /* successCheck@3x.png */; };
 		19BB9CAB21B351A4003C8A53 /* InCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 19BB9CA921B351A4003C8A53 /* InCommon.m */; };
 		19BB9CB421B351EC003C8A53 /* DLUUIDTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 19BB9CAC21B351EB003C8A53 /* DLUUIDTool.m */; };
-		19BB9CB521B351EC003C8A53 /* DLCentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 19BB9CAD21B351EB003C8A53 /* DLCentralManager.m */; };
-		19BB9CB621B351EC003C8A53 /* DLDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 19BB9CB021B351EB003C8A53 /* DLDevice.m */; };
 		19BB9CB721B351EC003C8A53 /* DLCloudDeviceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 19BB9CB321B351EC003C8A53 /* DLCloudDeviceManager.m */; };
 		19BB9CBA21B35A9F003C8A53 /* waiting@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9CB821B35A9F003C8A53 /* waiting@2x.png */; };
 		19BB9CBB21B35A9F003C8A53 /* waiting@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9CB921B35A9F003C8A53 /* waiting@3x.png */; };
@@ -109,9 +110,9 @@
 		19BB9D4121B36E51003C8A53 /* down@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D3D21B36E50003C8A53 /* down@2x.png */; };
 		19BB9D4421B36EA1003C8A53 /* icon_add_device@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4221B36EA0003C8A53 /* icon_add_device@2x.png */; };
 		19BB9D4521B36EA1003C8A53 /* icon_add_device@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4321B36EA0003C8A53 /* icon_add_device@3x.png */; };
-		19BB9D4921B37287003C8A53 /* voice1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4621B37286003C8A53 /* voice1.mp3 */; };
+		19BB9D4921B37287003C8A53 /* voice3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4621B37286003C8A53 /* voice3.mp3 */; };
 		19BB9D4A21B37287003C8A53 /* voice2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4721B37286003C8A53 /* voice2.mp3 */; };
-		19BB9D4B21B37287003C8A53 /* voice3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4821B37286003C8A53 /* voice3.mp3 */; };
+		19BB9D4B21B37287003C8A53 /* voice1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4821B37286003C8A53 /* voice1.mp3 */; };
 		19BB9D4E21B3754B003C8A53 /* annotation@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4C21B3754A003C8A53 /* annotation@2x.png */; };
 		19BB9D4F21B3754B003C8A53 /* annotation@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D4D21B3754A003C8A53 /* annotation@3x.png */; };
 		19BB9D5421B382EE003C8A53 /* uncheck@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 19BB9D5021B382ED003C8A53 /* uncheck@2x.png */; };
@@ -151,6 +152,12 @@
 /* Begin PBXFileReference section */
 		190EDF0921BB85080046DD87 /* changeCamera@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "changeCamera@3x.png"; sourceTree = "<group>"; };
 		190EDF0A21BB85090046DD87 /* changeCamera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "changeCamera@2x.png"; sourceTree = "<group>"; };
+		1965914421CCB92F0060525D /* DLDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLDevice.m; sourceTree = "<group>"; };
+		1965914521CCB92F0060525D /* DLCentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCentralManager.m; sourceTree = "<group>"; };
+		1965914621CCB92F0060525D /* DLCentralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCentralManager.h; sourceTree = "<group>"; };
+		1965914721CCB9300060525D /* DLDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLDevice.h; sourceTree = "<group>"; };
+		1965914A21CCB9B50060525D /* NSTimer+InTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+InTimer.m"; sourceTree = "<group>"; };
+		1965914B21CCB9B50060525D /* NSTimer+InTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+InTimer.h"; sourceTree = "<group>"; };
 		19A4227821AA7DA00001C063 /* SmartTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		19A4227B21AA7DA00001C063 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		19A4227C21AA7DA00001C063 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -194,11 +201,7 @@
 		19BB9CA921B351A4003C8A53 /* InCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InCommon.m; sourceTree = "<group>"; };
 		19BB9CAA21B351A4003C8A53 /* InCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InCommon.h; sourceTree = "<group>"; };
 		19BB9CAC21B351EB003C8A53 /* DLUUIDTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLUUIDTool.m; sourceTree = "<group>"; };
-		19BB9CAD21B351EB003C8A53 /* DLCentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCentralManager.m; sourceTree = "<group>"; };
 		19BB9CAE21B351EB003C8A53 /* DLCloudDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCloudDeviceManager.h; sourceTree = "<group>"; };
-		19BB9CAF21B351EB003C8A53 /* DLCentralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCentralManager.h; sourceTree = "<group>"; };
-		19BB9CB021B351EB003C8A53 /* DLDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLDevice.m; sourceTree = "<group>"; };
-		19BB9CB121B351EC003C8A53 /* DLDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLDevice.h; sourceTree = "<group>"; };
 		19BB9CB221B351EC003C8A53 /* DLUUIDTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLUUIDTool.h; sourceTree = "<group>"; };
 		19BB9CB321B351EC003C8A53 /* DLCloudDeviceManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCloudDeviceManager.m; sourceTree = "<group>"; };
 		19BB9CB821B35A9F003C8A53 /* waiting@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "waiting@2x.png"; sourceTree = "<group>"; };
@@ -276,9 +279,9 @@
 		19BB9D3D21B36E50003C8A53 /* down@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "down@2x.png"; sourceTree = "<group>"; };
 		19BB9D4221B36EA0003C8A53 /* icon_add_device@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_add_device@2x.png"; sourceTree = "<group>"; };
 		19BB9D4321B36EA0003C8A53 /* icon_add_device@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_add_device@3x.png"; sourceTree = "<group>"; };
-		19BB9D4621B37286003C8A53 /* voice1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = voice1.mp3; sourceTree = "<group>"; };
+		19BB9D4621B37286003C8A53 /* voice3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = voice3.mp3; sourceTree = "<group>"; };
 		19BB9D4721B37286003C8A53 /* voice2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = voice2.mp3; sourceTree = "<group>"; };
-		19BB9D4821B37286003C8A53 /* voice3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = voice3.mp3; sourceTree = "<group>"; };
+		19BB9D4821B37286003C8A53 /* voice1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = voice1.mp3; sourceTree = "<group>"; };
 		19BB9D4C21B3754A003C8A53 /* annotation@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "annotation@2x.png"; sourceTree = "<group>"; };
 		19BB9D4D21B3754A003C8A53 /* annotation@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "annotation@3x.png"; sourceTree = "<group>"; };
 		19BB9D5021B382ED003C8A53 /* uncheck@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "uncheck@2x.png"; sourceTree = "<group>"; };
@@ -326,12 +329,12 @@
 		192E107021B2D9E9000692D9 /* Bluetooth */ = {
 			isa = PBXGroup;
 			children = (
-				19BB9CAF21B351EB003C8A53 /* DLCentralManager.h */,
-				19BB9CAD21B351EB003C8A53 /* DLCentralManager.m */,
+				1965914721CCB9300060525D /* DLDevice.h */,
+				1965914421CCB92F0060525D /* DLDevice.m */,
+				1965914621CCB92F0060525D /* DLCentralManager.h */,
+				1965914521CCB92F0060525D /* DLCentralManager.m */,
 				19BB9CAE21B351EB003C8A53 /* DLCloudDeviceManager.h */,
 				19BB9CB321B351EC003C8A53 /* DLCloudDeviceManager.m */,
-				19BB9CB121B351EC003C8A53 /* DLDevice.h */,
-				19BB9CB021B351EB003C8A53 /* DLDevice.m */,
 				19BB9CB221B351EC003C8A53 /* DLUUIDTool.h */,
 				19BB9CAC21B351EB003C8A53 /* DLUUIDTool.m */,
 			);
@@ -361,9 +364,9 @@
 		19A4227A21AA7DA00001C063 /* SmartTracker */ = {
 			isa = PBXGroup;
 			children = (
-				19BB9D4621B37286003C8A53 /* voice1.mp3 */,
+				19BB9D4821B37286003C8A53 /* voice1.mp3 */,
 				19BB9D4721B37286003C8A53 /* voice2.mp3 */,
-				19BB9D4821B37286003C8A53 /* voice3.mp3 */,
+				19BB9D4621B37286003C8A53 /* voice3.mp3 */,
 				19A422AD21AA7F070001C063 /* image */,
 				19A422D921AA80B40001C063 /* Library */,
 				19A422E221AA81B00001C063 /* Tool */,
@@ -552,6 +555,8 @@
 				19BB9CE821B35D99003C8A53 /* InAlertView.xib */,
 				19BB9CE721B35D99003C8A53 /* InAnnotationView.h */,
 				19BB9CE921B35D9A003C8A53 /* InAnnotationView.m */,
+				1965914B21CCB9B50060525D /* NSTimer+InTimer.h */,
+				1965914A21CCB9B50060525D /* NSTimer+InTimer.m */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -725,7 +730,7 @@
 				19BB9D3221B36944003C8A53 /* RSSI_5@2x.png in Resources */,
 				19BB9D0D21B36834003C8A53 /* 30@2x.png in Resources */,
 				19BB9D6A21B383B0003C8A53 /* photoGreenCamera@3x.png in Resources */,
-				19BB9D4B21B37287003C8A53 /* voice3.mp3 in Resources */,
+				19BB9D4B21B37287003C8A53 /* voice1.mp3 in Resources */,
 				19BB9D1021B36834003C8A53 /* 30@3x.png in Resources */,
 				19A4232A21AA9F830001C063 /* successCheck@3x.png in Resources */,
 				19BB9D2E21B36944003C8A53 /* RSSI_4@3x.png in Resources */,
@@ -740,7 +745,7 @@
 				19BB9D4421B36EA1003C8A53 /* icon_add_device@2x.png in Resources */,
 				19A422FE21AA8D8F0001C063 /* SmartCard@3x.png in Resources */,
 				19BB9D5621B382EE003C8A53 /* check@2x.png in Resources */,
-				19BB9D4921B37287003C8A53 /* voice1.mp3 in Resources */,
+				19BB9D4921B37287003C8A53 /* voice3.mp3 in Resources */,
 				19A4231421AA97FF0001C063 /* searchImage@2x.png in Resources */,
 				19BB9D6421B3836D003C8A53 /* photoBackground@2x.png in Resources */,
 				19A4232921AA9F830001C063 /* successCheck@2x.png in Resources */,
@@ -790,7 +795,7 @@
 			files = (
 				19BB9CCC21B35C53003C8A53 /* InDeviceListCell.m in Sources */,
 				19A422BB21AA7F6B0001C063 /* InSearchDeviceViewController.m in Sources */,
-				19BB9CB521B351EC003C8A53 /* DLCentralManager.m in Sources */,
+				1965914C21CCB9B50060525D /* NSTimer+InTimer.m in Sources */,
 				19A422B821AA7F6B0001C063 /* InSelectionViewController.m in Sources */,
 				19BB9CDD21B35D56003C8A53 /* InChangeDeviceNameView.m in Sources */,
 				19BB9CB721B351EC003C8A53 /* DLCloudDeviceManager.m in Sources */,
@@ -798,16 +803,17 @@
 				19BB9CCA21B35C53003C8A53 /* InDeviceListViewController.m in Sources */,
 				19BB9CC121B35C2F003C8A53 /* InControlDeviceViewController.m in Sources */,
 				19BB9CAB21B351A4003C8A53 /* InCommon.m in Sources */,
+				1965914921CCB9300060525D /* DLCentralManager.m in Sources */,
 				19BB9CEB21B35D9A003C8A53 /* InAnnotationView.m in Sources */,
 				19BB9CD721B35D19003C8A53 /* InDeviceSettingFooterView.m in Sources */,
 				19BB9CB421B351EC003C8A53 /* DLUUIDTool.m in Sources */,
+				1965914821CCB9300060525D /* DLDevice.m in Sources */,
 				19BB9CD121B35C70003C8A53 /* InDeviceListAddDeviceCell.m in Sources */,
 				19BB9CE521B35D6C003C8A53 /* InAlertTableViewController.m in Sources */,
 				19A4227D21AA7DA00001C063 /* AppDelegate.m in Sources */,
 				19BB9CE621B35D6C003C8A53 /* InAlarmTypeSelectionView.m in Sources */,
 				19A422DF21AA80C50001C063 /* MBProgressHUD.m in Sources */,
 				19BB9CD821B35D19003C8A53 /* InDeviceSettingViewController.m in Sources */,
-				19BB9CB621B351EC003C8A53 /* DLDevice.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,6 +17,8 @@
 // 蓝牙断开通知，做离线处理，和打开蓝牙通知处理
 #define BluetoothPoweredOffNotification @"BluetoothPoweredOffNotification"
 
+#define APPBeKilledNotification @"APPBeKilledNotification"
+
 // 保存已发现设备的类
 @interface DLKnowDevice:NSObject
 @property (nonatomic, strong) CBPeripheral *peripheral;

@@ -14,6 +14,9 @@
 #define DLWriteCharacteristicUUID 0xE002
 #define DLNTFCharacteristicUUID 0xE003
 
+#define DLFirmwareServerUUID 0x180A
+#define DLFirmwareCharacteristicUUID 0x2A26
+
 @interface DLUUIDTool : NSObject
 
 + (CBUUID *)CBUUIDFromInt:(int)UUID;

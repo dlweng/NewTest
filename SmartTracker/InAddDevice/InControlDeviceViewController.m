@@ -524,7 +524,7 @@
 }
 - (IBAction)setPhotoSharkLight {
     NSLog(@"设置闪光灯");
-    [common setupSharkLight];
+//    [common setupSharkLight];
 }
 
 - (IBAction)changeCameraDirection {
@@ -668,7 +668,7 @@
     else {
         if (self.searchPhoneDevices.count == 0) {
             // 只有在当前没有声音和闪光动画的时候才需要去开启
-            [common playSoundAlertMusic];
+//            [common playSoundAlertMusic];
             [self startBtnAnimation];
         }
         
@@ -684,7 +684,7 @@
 
 - (void)stopSearchPhone {
     if (self.searchPhoneDevices.count == 0) {
-        [common stopSoundAlertMusic];
+//        [common stopSoundAlertMusic];
         [self stopBtnAnimation];
     }
 }

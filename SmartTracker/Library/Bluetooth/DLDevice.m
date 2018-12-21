@@ -13,36 +13,40 @@
 #import "DLDevice.h"
 #import "DLUUIDTool.h"
 #import "DLCentralManager.h"
+#import "InCommon.h"
+#import "NSTimer+InTimer.h"
+#import <AVFoundation/AVFoundation.h>
 #import "DLCloudDeviceManager.h"
 
 // 设置离线的RSSI值
 #define offlineRSSI @(-120)
 
 // 设置重连超时  重连超时时间一定要为连接超时时间的倍数
-#define reconnectTimeOut 9  // 实际的超时时间是reconnectTimeOut - 1
-#define connectTimerOut 4 // 去连接设备5秒没连上认为超时
+#define reconnectTimeOut 17
+#define reconnectMaxCount 10
 
-@interface DLDevice() {
+@interface DLDevice()<AVAudioPlayerDelegate> {
     NSNumber *_rssi;
     dispatch_source_t _searchDeviceackDelayTimer;// 查找设备ack回复计时器
     dispatch_source_t _disciverServerTimer;// 获取写数据特征值计时器
-    BOOL _disConnect; // 标识用户主动断开了设备连接，不做重连
-    dispatch_source_t _connectTimer;// 计算连接超时的计时器
+    BOOL _disConnect; // 只有删除设备或者注销账户该值会被值为YES
     
     NSTimer *_offlineReconnectTimer; //断开重连计时器
     int _offlineReconnectTime; //计算从断开到重连的时间
-    int _connectHandler; //连接计数
 }
 
 @property (nonatomic, assign) BOOL isGetSearchDeviceAck; // 标识下发查找设备命令得到ack否
-@property (nonatomic, assign) BOOL isDiscoverServer; //标志是否获取到写数据特征值
+@property (nonatomic, assign) NSInteger isDiscoverAllCharacter; //标志是否获取到写数据特征值
 
 // 保存设置的值，等ack回来之后更新本地数据
+@property (nonatomic, assign) int reconnectNum;
 @property (nonatomic, assign) BOOL disconnectAlert;
 @property (nonatomic, assign) BOOL reconnectAlert;
 @property (nonatomic, assign) NSInteger alertMusic;
 @property (nonatomic, strong) NSMutableDictionary *data;
 @property (nonatomic, strong) NSMutableArray *rssiValues; // 更新RSSI逻辑，1秒获取一次RSSI，3秒更新一次UI，将3秒钟获取到的3次RSSI的最大值通知到界面
+@property (nonatomic, strong) AVAudioPlayer *searchPhonePlayer;
+@property (nonatomic, strong) AVAudioPlayer *offlinePlayer;
 @end
 
 @implementation DLDevice
@@ -50,27 +54,32 @@
 + (instancetype)device:(CBPeripheral *)peripheral {
     DLDevice *device = [[DLDevice alloc] init];
     device.peripheral = peripheral;
-    
-    // 增加断开连接监听
-    [[NSNotificationCenter defaultCenter] addObserver:device selector:@selector(reconnectDevice:) name:DeviceDisconnectNotification object:nil];
-    // 蓝牙关闭监听
-    [[NSNotificationCenter defaultCenter] addObserver:device selector:@selector(bluetoothPoweredOff) name:BluetoothPoweredOffNotification object:nil];
     return device;
 }
 
 - (instancetype)init {
     if (self = [super init]) {
-
+        // 增加断开连接监听
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectDevice:) name:DeviceDisconnectNotification object:nil];
+        // 蓝牙关闭监听
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(bluetoothPoweredOff) name:BluetoothPoweredOffNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWasKilled) name:APPBeKilledNotification object:nil];
+        
         _disConnect = NO;
         _isGetSearchDeviceAck = NO;
-        
+        self.isOfflineSounding = NO;
+        self.isSearchPhone = NO;
         // 初始化断开重连计时器数据
-        _offlineReconnectTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(offlineTiming) userInfo:nil repeats:YES];
+        __block typeof(self) weakSelf = self;
+        _offlineReconnectTimer = [NSTimer newTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            [weakSelf offlineTiming];
+        }];
+
         [[NSRunLoop currentRunLoop] addTimer:_offlineReconnectTimer forMode:NSRunLoopCommonModes];
         // 加到主循环的定时器会自动被触发，需要先关闭定时器
         [_offlineReconnectTimer setFireDate:[NSDate distantFuture]];
-        _offlineReconnectTime = 0;
-        
+        _offlineReconnectTime = -1;
+    
     }
     return self;
 }
@@ -78,6 +87,7 @@
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:DeviceDisconnectNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:BluetoothPoweredOffNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:APPBeKilledNotification object:nil];
 }
 
 #pragma mark - 获取特征值的处理
@@ -85,8 +95,9 @@
     if (_peripheral) {
         NSLog(@"去获取设备服务:%@", self.mac);
         CBUUID *serviceUUID = [DLUUIDTool CBUUIDFromInt:DLServiceUUID];
-        [_peripheral discoverServices:@[serviceUUID]];
-        self.isDiscoverServer = NO;
+        CBUUID *firmwareServerUUID = [DLUUIDTool CBUUIDFromInt:DLFirmwareServerUUID];
+        [_peripheral discoverServices:@[serviceUUID, firmwareServerUUID]];
+        self.isDiscoverAllCharacter = 0;
         [self startDiscoverServerTimer];
     }
     else {
@@ -97,13 +108,14 @@
 - (void)startDiscoverServerTimer {
     _disciverServerTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
     __weak typeof(_disciverServerTimer) weakTimer = _disciverServerTimer;
+    __weak typeof(self) weakSelf = self;
     dispatch_source_set_event_handler(_disciverServerTimer, ^{
         dispatch_source_cancel(weakTimer);
-        if (!self.isDiscoverServer) {
-            // 如果连接上设备去获取特征值超过5秒没查找到，断开重新连接设备
-            [self disConnectAndReconnectDevice:nil];
+        if (weakSelf.isDiscoverAllCharacter == 0) {
+            if (weakSelf.peripheral) {
+                 [[DLCentralManager sharedInstance] disConnectToDevice:weakSelf.peripheral completion:nil];
+            }
         }
-        NSLog(@"发现服务定时器超时被执行");
     });
     // 设置5秒超时
     dispatch_source_set_timer(_disciverServerTimer, dispatch_time(DISPATCH_TIME_NOW, 5*NSEC_PER_SEC), 0, 0);
@@ -113,12 +125,17 @@
 - (void)peripheral:(CBPeripheral *)_peripheral didDiscoverServices:(NSError *)error {
     NSArray *services = [_peripheral services];
     CBUUID *serverUUID = [DLUUIDTool CBUUIDFromInt:DLServiceUUID];
+    CBUUID *firmwareServerUUID = [DLUUIDTool CBUUIDFromInt:DLFirmwareServerUUID];
     for (CBService *service in services) {
         if ([service.UUID.UUIDString isEqualToString:serverUUID.UUIDString]) {
-//            NSLog(@"发现服务0xE001");
             CBUUID *ntfUUID = [DLUUIDTool CBUUIDFromInt:DLNTFCharacteristicUUID];
             CBUUID *writeUUID = [DLUUIDTool CBUUIDFromInt:DLWriteCharacteristicUUID];
             [self.peripheral discoverCharacteristics:@[ntfUUID, writeUUID] forService:service];
+        }
+        else if ([service.UUID.UUIDString isEqualToString:firmwareServerUUID.UUIDString]) {
+            CBUUID *firmwareChaUUID = [DLUUIDTool CBUUIDFromInt:DLFirmwareCharacteristicUUID];
+            [self.peripheral discoverCharacteristics:@[firmwareChaUUID] forService:service];
+            NSLog(@"service = %@", service);
         }
     }
 }
@@ -126,22 +143,48 @@
 - (void) peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error {
     CBUUID *ntfUUID = [DLUUIDTool CBUUIDFromInt:DLNTFCharacteristicUUID];
     CBUUID *writeUUID = [DLUUIDTool CBUUIDFromInt:DLWriteCharacteristicUUID];
+    CBUUID *firmwareChaUUID = [DLUUIDTool CBUUIDFromInt:DLFirmwareCharacteristicUUID];
     NSArray *characteristics = [service characteristics];
     for (CBCharacteristic *characteristic in characteristics) {
+        if ([characteristic.UUID.UUIDString isEqualToString:firmwareChaUUID.UUIDString]) {
+            NSLog(@"characteristic = %@", characteristic);
+            [self.peripheral readValueForCharacteristic:characteristic];
+            return; //获取硬件数据
+        }
         if ([characteristic.UUID.UUIDString isEqualToString:writeUUID.UUIDString]) {
-            [self.peripheral readRSSI]; // 先读一次信号值，显示到UI，优化用户体验
-            self.isDiscoverServer = YES;
-            self.online = YES;  //设置在线
-            NSLog(@"去激活设备: %@", _mac);
-            [self activeDevice];
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self getDeviceInfo]; //防止两次发生时间太接近，导致下发失败
-            });
-            
+            self.isDiscoverAllCharacter++;
         }
         if ([characteristic.UUID.UUIDString isEqualToString:ntfUUID.UUIDString]) {
-//            NSLog(@"发现E003, 打开监听来自设备通知的功能");
+            self.isDiscoverAllCharacter++;
             [self notification:DLServiceUUID characteristicUUID:DLNTFCharacteristicUUID p:self.peripheral on:YES];
+        }
+        if (self.isDiscoverAllCharacter == 2) {
+            __weak typeof(self) weakSelf = self;
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [NSThread sleepForTimeInterval:0.2];
+                //激活设备
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSLog(@"去激活设备: %@", weakSelf.mac);
+                    [weakSelf activeDevice];
+                });
+                if (self.firstAdd) { 
+                    self.firstAdd = NO;
+                    [NSThread sleepForTimeInterval:0.2];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSLog(@"第一次添加，去发关闭断连通知的命令");
+                        [weakSelf setDisconnectAlert:NO reconnectAlert:NO];
+                    });
+                }
+                [NSThread sleepForTimeInterval:0.2];
+                // 获取设备信息
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    weakSelf.online = YES;  //设置在线
+                    weakSelf.reconnectNum = 0;
+                    NSLog(@"设置设备在线");
+                    [weakSelf readRSSI];
+                    [weakSelf getDeviceInfo]; //防止两次发生时间太接近，导致下发失败
+                });
+            });
         }
     }
 }
@@ -174,7 +217,7 @@
 }
 
 - (void)readRSSI {
-    if (self.online) {
+    if (self.online && self.connected) {
         [self.peripheral readRSSI];
     }
 }
@@ -191,33 +234,34 @@
 
 - (void)peripheral:(CBPeripheral *)peripheral didReadRSSI:(NSNumber *)RSSI error:(NSError *)error {
     if (peripheral == self.peripheral && !error) {
+        NSLog(@"接收到设备信号值: %@, mac:%@", RSSI, self.mac);
         self.rssi = RSSI;
     }
 }
 
 #pragma mark - 写数据快捷接口
 - (void)activeDevice {
-    char active[1] = {0x01};
+    uint8_t active[1] = {0x01};
     [self write:[NSData dataWithBytes:active length:1]];
 }
 
 - (void)getDeviceInfo {
-    if (!self.isDiscoverServer) {
+    if (!self.connected) {
         return;
     }
-    char getDeviceInfo[4] = {0xEE, 0x01, 0x00, 0x00};
+    uint8_t getDeviceInfo[4] = {0xEE, 0x01, 0x00, 0x00};
     NSLog(@"mac = %@, 去获取设备硬件数据， %@", self.mac, [NSData dataWithBytes:getDeviceInfo length:4]);
-    [self write:[NSData dataWithBytes:getDeviceInfo length:strlen(getDeviceInfo)]];
+    [self write:[NSData dataWithBytes:getDeviceInfo length:4]];
 }
 
 - (void)searchDevice {
-    char search[4] = {0xEE, 0x03, 0x00, 0x00};
+    uint8_t search[4] = {0xEE, 0x03, 0x00, 0x00};
     [self write:[NSData dataWithBytes:search length:4]];
 }
 
 - (void)searchPhoneACK {
     NSLog(@"回应设备:%@ 的查找数据", _mac);
-    char search[4] = {0xEE, 0x06, 0x00, 0x00};
+    uint8_t search[4] = {0xEE, 0x06, 0x00, 0x00};
     [self write:[NSData dataWithBytes:search length:4]];
 }
 
@@ -226,7 +270,7 @@
     self.reconnectAlert = reconnectAlert;
     int disconnect = disconnectAlert? 0x01 : 0x00;
     int reconnect = reconnectAlert? 0x01: 0x00;
-    char command[] = {0xEE, 0x07, 0x02, disconnect, reconnect, 0x00};
+    uint8_t command[6] = {0xEE, 0x07, 0x02, disconnect, reconnect, 0x00};
     NSLog(@"改变设备：%@, 断连通知：%d, 重连通知：%d， 写数据: %@", _mac, disconnectAlert, reconnectAlert, [NSData dataWithBytes:command length:6]);
     [self write:[NSData dataWithBytes:command length:6]];
 }
@@ -259,9 +303,6 @@
     NSString *cmd = [dataStr substringWithRange:NSMakeRange(3, 2)];
     NSString *length = [dataStr substringWithRange:NSMakeRange(5, 2)];
     NSString *payload = [dataStr substringWithRange:NSMakeRange(7, length.integerValue * 2)];
-    //校验和
-//    NSString *cs = [dataStr substringWithRange:NSMakeRange(7+length.integerValue*2, 2)];
-//    NSLog(@"cmd = %@, length = %@, payload = %@, cs = %@", cmd, length, payload, cs);
     if ([cmd isEqualToString:@"02"]) {
         if (payload.length != 10) {
             return;
@@ -341,37 +382,20 @@
 
 - (void) peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
     NSLog(@"mac:%@, 写入的响应值: %@,  %@", self.mac, characteristic, error);
-//    [self readData];
 }
-
-//- (void)readData {
-//    if (self.peripheral) {
-//        [self readValue:DLServiceUUID characteristicUUID:DLNTFCharacteristicUUID p:self.peripheral];
-//    }
-//    else {
-//        NSLog(@"mac:%@, 查找不到外设，无法读数据", self.mac);
-//    }
-//}
-
-//-(void) readValue: (int)serviceUUID characteristicUUID:(int)characteristicUUID p:(CBPeripheral *)p {
-//    CBUUID *su = [DLUUIDTool CBUUIDFromInt:serviceUUID];
-//    CBUUID *cu = [DLUUIDTool CBUUIDFromInt:characteristicUUID];
-//    CBService *service = [self findServiceFromUUID:su p:p];
-//    if (!service) {
-//        NSLog(@"mac:%@, 读数据查找不到服务: %s", self.mac, [self CBUUIDToString:su]);
-//        return;
-//    }
-//    CBCharacteristic *characteristic = [self findCharacteristicFromUUID:cu service:service];
-//    if (!characteristic) {
-//        NSLog(@"mac:%@, 读数据查找不到角色: %s", self.mac, [self CBUUIDToString:cu]);
-//        return;
-//    }
-//    [p readValueForCharacteristic:characteristic];
-//}
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
     if ([peripheral.identifier.UUIDString isEqualToString:self.peripheral.identifier.UUIDString]) {
         NSLog(@"mac:%@, 接收读响应数据, peripheral：%@,  characteristic = %@, error = %@", self.mac, self.peripheral, characteristic.value, error);
+        // 读硬件版本号
+        CBUUID *firmwareChaUUID = [DLUUIDTool CBUUIDFromInt:DLFirmwareCharacteristicUUID];
+        if ([characteristic.UUID.UUIDString isEqualToString:firmwareChaUUID.UUIDString]) {
+            NSString *value = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+            self.firmware = value;
+            return;
+        }
+        
+        // 读普通数据
         [self parseData:characteristic.value];
         if (self.delegate) {
             [self.delegate device:self didUpdateData:self.lastData];
@@ -397,13 +421,12 @@
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error {
     NSLog(@"mac:%@, 接收来自设备的通知, characteristic = %@, error = %@", self.mac, characteristic, error);
+    
     [self parseData:characteristic.value];
 }
 
 #pragma mark - 连接与断开连接
 - (void)connectToDevice:(void (^)(DLDevice *device, NSError *error))completion {
-    _disConnect = NO; // 重新设置断开连接的标识
-    __block NSNumber *isCallback; // 标识是否已经被回调
     if (!self.peripheral) {
         NSError *error = [NSError errorWithDomain:NSStringFromClass([DLCentralManager class]) code:-2 userInfo:@{NSLocalizedDescriptionKey: @"与设备建立连接失败"}];
         if (completion) {
@@ -411,77 +434,35 @@
         }
         return;
     }
-    if (self.peripheral.state == CBPeripheralStateConnecting) {
-        [self disConnectToDevice:^(DLDevice *device, NSError *error) {
-            
-        }];
-    }
-    if (self.peripheral.state == CBPeripheralStateDisconnected || self.peripheral.state == CBPeripheralStateDisconnecting) {
-        _connectHandler++;
-        NSLog(@"开始去连接设备:%@, 连接计数:%d", self.mac, _connectHandler);
-        [[DLCentralManager sharedInstance] connectToDevice:self.peripheral completion:^(DLCentralManager *manager, CBPeripheral *peripheral, NSError *error) {
-            NSLog(@"设备连接结果： %@, 线程:%@", self.mac, [NSThread currentThread]);
-            self->_connectHandler--;
-            if (!error) {
-                NSLog(@"连接设备成功:%@, 连接计数:%d", self.mac, self->_connectHandler);
-                // 连接成功，去获取设备服务
-                peripheral.delegate = self;
-                [self discoverServices];
-                if (completion) {
-                    completion(self, nil);
-                }
-                isCallback = @(YES);
-                return ;
-            }
-            else {
-                if (self->_offlineReconnectTime > 0 && self->_offlineReconnectTime <= reconnectTimeOut && self->_connectHandler == 0) {
-                    NSLog(@"连接失败，在重连超时时间内，重新去连接: %@", self.mac);
-                    // 在重连超时时间内，去做重连
-                    [self disConnectAndReconnectDevice:nil];
+    if (!self.connecting) {
+        NSLog(@"开始去连接设备:%@", self.mac);
+        __weak typeof(self) weakSelf = self;
+        dispatch_async(dispatch_queue_create(0, 0), ^{
+            [[DLCentralManager sharedInstance] connectToDevice:weakSelf.peripheral completion:^(DLCentralManager *manager, CBPeripheral *peripheral, NSError *error) {
+                if (!error) {
+                    NSLog(@"连接设备成功:%@", weakSelf.mac);
+                    // 连接成功，去获取设备服务
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self stopReconnectTimer];
+                        self.isOfflineSounding = NO;
+                        peripheral.delegate = weakSelf;
+                        [weakSelf discoverServices];
+                        if (completion) {
+                            completion(weakSelf, nil);
+                        }
+                    });
+                    return ;
                 }
                 else {
-                    NSLog(@"连接失败: %@, error = %@, 连接计数:%d", self.mac, error, self->_connectHandler);
-                    if (completion) {
-                        completion(self, error);
-                    }
-                    isCallback = @(YES);
+                    NSLog(@"连接设备失败:%@", weakSelf.mac);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (completion) {
+                            completion(weakSelf, error);
+                        }
+                    });
                 }
-            }
-        }];
-        
-        // 开启连接计时器, 超时没连接上认为连接失败
-        _connectTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
-        __weak typeof(_connectTimer) weakTimer = _connectTimer;
-        dispatch_source_set_event_handler(_connectTimer, ^{
-            dispatch_source_cancel(weakTimer);
-            if (!isCallback.boolValue) { //没被回调，才进入这里
-                self->_connectHandler--;
-                NSError *error = [NSError errorWithDomain:NSStringFromClass([self class]) code:-1 userInfo:nil];
-                if (completion) {
-                    completion(self, error);
-                }
-                if (self->_offlineReconnectTime > 0 && self->_offlineReconnectTime <= reconnectTimeOut && self->_connectHandler == 0) {
-                    NSLog(@"连接设备超时，在重连超时时间内，去重连设备: %@", self.mac);
-                    // 在重连超时时间内，去做重连
-                    [self disConnectAndReconnectDevice:nil];
-                }
-                else {
-                    NSLog(@"连接设备超时，不在重连超时时间内，去回调 %@, error = %@, 连接计数: %d", self.mac, error, self->_connectHandler);
-                    if (self->_connectHandler == 0) {
-                        [self disConnectToDevice:nil];
-                    }
-                    if (completion) {
-                        completion(self, error);
-                    }
-                }
-            }
-            else {
-                NSLog(@"过了连接超时时间，已经连接上设备: %@", self.mac);
-            }
+            }];
         });
-        // 设置5秒超时
-        dispatch_source_set_timer(_connectTimer, dispatch_time(DISPATCH_TIME_NOW, connectTimerOut*NSEC_PER_SEC), 0, 0);
-        dispatch_resume(_connectTimer);
     }
     else {
         if (completion) {
@@ -491,7 +472,11 @@
 }
 
 - (void)disConnectToDevice:(void (^)(DLDevice *device, NSError *error))completion {
+    // 只有删除设备和注销账户可以调用可以接口去断连
     _disConnect = YES;
+    // 当前如果有正在重连的操作，需要去关闭
+    [_offlineReconnectTimer setFireDate:[NSDate distantFuture]];
+    self.reconnectNum = reconnectMaxCount;
     if (!self.peripheral) {
         // 不存在外设，当成断开设备连接成功
         if (completion) {
@@ -500,114 +485,87 @@
         return;
     }
     NSLog(@"开始去断开设备连接:%@", self.mac);
+    __weak typeof(self) weakSelf = self;
     [[DLCentralManager sharedInstance] disConnectToDevice:self.peripheral completion:^(DLCentralManager *manager, CBPeripheral *peripheral, NSError *error) {
         if (completion) {
-            completion(self, error);
+            completion(weakSelf, error);
         }
     }];
-}
-
-// 获取不到服务的情况下，必须断开重连
-- (void)disConnectAndReconnectDevice:(void (^)(DLDevice *device, NSError *error))completion {
-    _disConnect = YES;
-    if (self.peripheral) {
-        NSLog(@"开始去断开设备连接:%@", self.mac);
-        if (self.connected) {
-            [[DLCentralManager sharedInstance] disConnectToDevice:self.peripheral completion:^(DLCentralManager *manager, CBPeripheral *peripheral, NSError *error) {
-                dispatch_async(dispatch_queue_create(0, 0), ^{
-                    [self connectToDevice:^(DLDevice *device, NSError *error) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if (completion) {
-                                completion(device, error);
-                            }
-                        });
-                    }];
-                });
-            }];
-        }
-        else {
-            dispatch_async(dispatch_queue_create(0, 0), ^{
-                [self connectToDevice:^(DLDevice *device, NSError *error) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (completion) {
-                            completion(device, error);
-                        }
-                    });
-                }];
-            });
-            
-        }
-    }
-    else {
-        if (completion) {
-            completion(self, nil); //不存在外设的情况不处理
-        }
-    }
 }
 
 - (void)reconnectDevice:(NSNotification *)notification {
     CBPeripheral *peripheral = notification.object;
     if ([peripheral.identifier.UUIDString isEqualToString:self. peripheral.identifier.UUIDString]) {
-        if (!_disConnect)
+        NSLog(@"断开连接的设备： %@", peripheral);
+        if (!_disConnect) // 非用户主动断开的情况
         {
-            // 只处理被动断连的离线
-            // 删除和重连的时候才会做主动离线
-            // 删除的主动离线，在删除接口做了离线赋值
-            // 重连的主动离线本身就是被动断连触发的，由被动断连去做离线处理
-            // 获取服务超时的主动断连，由于还未被赋值为在线，不需要去重新赋值为离线
-            if ([DLCentralManager sharedInstance].state == CBCentralManagerStatePoweredOn) {
-                //被动的掉线且蓝牙打开，去做重连
-                NSLog(@"设备连接被断开，去重连设备, mac = %@, 线程 = %@", self.mac, [NSThread currentThread]);
-                // 去重连设备
-                self.isDiscoverServer = NO;
-                
-                // 开始重连计时
-                [_offlineReconnectTimer setFireDate:[NSDate distantPast]];
-                
-//                // 激活后台线程 重连超时大于10秒，才需要这两行代码
-//                self.isReconnectTimer = YES; // 标志开始了重连计时
-//                [common beginBackgroundTask];
-                
-                // 去连接设备
-                [self connectToDevice:^(DLDevice *device, NSError *error) {
-                    if (error) {
-                        NSLog(@"mac: %@, 设备重连失败", self.mac);
-                    }
-                    else {
-                        NSLog(@"mac: %@, 设备重连成功", self.mac);
-                    }
-                }];
+            // 去做超时重连
+            [self reconnectOprate];
+        }
+        else {
+            // 用户断连的，直接设置离线
+            [self changeStatusToDisconnect:NO];
+        }
+    }
+}
+
+- (void)reconnectOprate {
+    //被动的掉线且蓝牙打开，去做重连
+    if (self.online && !self.isReconnectTimer) { //当前是在线，需要计时设置为离线
+        // 开始重连计时
+        [_offlineReconnectTimer setFireDate:[NSDate distantPast]];
+        //                    // 激活后台线程 重连超时大于10秒，才需要这两行代码
+        self.isReconnectTimer = YES; // 标志开始了重连计时
+        [common beginBackgroundTask];
+    }
+    if (self.reconnectNum < reconnectMaxCount) {
+        if (self.connecting) {
+            return; // 如果当前设备处于正在连接的状态，不去做重连
+        }
+        self.reconnectNum++;
+        NSLog(@"设备连接被断开，去重连设备, mac = %@, 重连计数: %d", self.mac, self.reconnectNum);
+        // 去重连设备
+        self.isDiscoverAllCharacter = 0;
+        [self connectToDevice:^(DLDevice *device, NSError *error) {
+            if (error) {
+                NSLog(@"mac: %@, 设备重连失败", self.mac);
             }
             else {
-                // 做离线处理
-                [self changeStatusToDisconnect];
+                NSLog(@"mac: %@, 设备重连成功", self.mac);
             }
-        }
+        }];
+    }
+    else {
+        NSLog(@"已经重连%d次, 不再去重连:%@", self.reconnectNum, self.mac);
+        
     }
 }
 
 // 计算重连时间
 - (void)offlineTiming {
     _offlineReconnectTime++;
-    NSLog(@"重连时间: %d", _offlineReconnectTime);
+    NSLog(@"重连时间: %d，mac: %@", _offlineReconnectTime, self.mac);
     if (_offlineReconnectTime >= reconnectTimeOut) {
-        // 重连超时结束
-        _offlineReconnectTime = 0;
-        // 停止计时器，去报设备离线
-        [_offlineReconnectTimer setFireDate:[NSDate distantFuture]];
-        NSLog(@"重连超时时间已到, 线程:%@", [NSThread currentThread]);
-        if (!self.isDiscoverServer) {
-            // 到超时时间还没重连上，判断设备为离线
-            NSLog(@"重连超时，还没连上设备, mac = %@", self.mac);
-            [self changeStatusToDisconnect];
+        if (!self.connected) { // 判断重连的条件降低
+            NSLog(@"重连超时，还没连上设备, 保存设备离线信息 mac = %@", self.mac);
+            [self changeStatusToDisconnect:YES];
         }
         else {
             NSLog(@"重连超时，已经连上设备, mac = %@", self.mac);
         }
-//        // 标志计时结束， 重连超时时间大于10秒，才需要这两行代码
-//        self.isReconnectTimer = NO;
-//        [common endBackgrondTask];
+        [self stopReconnectTimer];
     }
+}
+
+- (void)stopReconnectTimer {
+    // 关闭计时器
+    _offlineReconnectTime = -1;
+    [_offlineReconnectTimer setFireDate:[NSDate distantFuture]];
+    // 初始化重连标志
+    self.isReconnectTimer = NO;
+    self.reconnectNum = 0;
+    // 关闭后台任务
+    [common endBackgrondTask];
 }
 
 #pragma mark - 查找服务和角色的作用
@@ -686,36 +644,32 @@
 }
 
 #pragma mark - 设备离线处理
-- (void)changeStatusToDisconnect{
-    BOOL oldOnline = self.online; // 保存旧的在线状态
-    NSLog(@"self.mac = %@, 设备离线，去做离线处理, 旧的在线状态：%d", self.mac, oldOnline);
-    self.online = NO;
-    _rssi = offlineRSSI;  // 1.设置rssi掉线
-    // 2.获取最新位置与时间， 并保存
-    _coordinate = common.currentLocation;
-    _offlineTime = [common getCurrentTime];
-    [[DLCloudDeviceManager sharedInstance] updateOfflineInfoWithDevice:self];
-    if ([self.lastData boolValueForKey:DisconnectAlertKey defaultValue:NO]) {
-        if (oldOnline) { // 如果原来是在线状态，再去发送离线通知和声音，提高用户体验, 因为只有获取到服务才认为在线，连接与在线状态不等同
-            // 关闭的断开连接通知，则不通知
-            if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
-                NSLog(@"去做掉线通知: %@", self.mac);
-                [common sendLocalNotification:[NSString stringWithFormat:@"%@ 已断开连接", self.deviceName]];
-            }
-            [common playSound];
-        }
-    }
-    else {
-#warning 测试使用
-        if (oldOnline) { // 如果原来是在线状态，再去发送离线通知和声音，提高用户体验, 因为只有获取到服务才认为在线，连接与在线状态不等同
-            // 关闭的断开连接通知，则不通知
-            if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
-                NSLog(@"去做掉线通知: %@", self.mac);
-                [common sendLocalNotification:[NSString stringWithFormat:@"%@ 已断开连接", self.deviceName]];
-                [common playSound];
+- (void)changeStatusToDisconnect:(BOOL)notification {
+    if (self.online) {
+        self.online = NO;
+        // 1.设置rssi掉线
+        _rssi = offlineRSSI;
+        // 2.获取最新位置与时间， 并保存
+        NSLog(@"保存设备离线信息");
+        _coordinate = common.currentLocation;
+        _offlineTime = [common getCurrentTime];
+        [[DLCloudDeviceManager sharedInstance] updateOfflineInfoWithDevice:self];
+        if (notification) {
+            if ([self.lastData boolValueForKey:DisconnectAlertKey defaultValue:NO]) {
+                // 如果原来是在线状态，再去发送离线通知和声音，提高用户体验, 因为只有获取到服务才认为在线，连接与在线状态不等同
+                // 关闭的断开连接通知，则不通知
+                if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+                    NSLog(@"去做掉线通知: %@", self.mac);
+                    [common sendLocalNotification:[NSString stringWithFormat:@"%@ disconnects from iPhone.", self.deviceName]];
+                }
+                self.isOfflineSounding = YES;
+                self.isSearchPhone = NO;
+                NSLog(@"播放离线音乐");
             }
         }
     }
+    
+   
 
 //     如果正在查找设备，关闭查找动画
 //    _isSearchDevice = NO;
@@ -727,12 +681,24 @@
 
 // 关闭蓝牙做离线处理
 - (void)bluetoothPoweredOff {
+//    if (self.online) {
+//        if (!_isGetSearchDeviceAck) { // 关闭蓝牙的时候，肯定接受不到设备的回复，如果按钮有正在查找设备的动画，需要关闭
+//            [[NSNotificationCenter defaultCenter] postNotificationName:DeviceGetAckFailedNotification object:nil];
+//        }
+//    }
+    // 去做离线倒计时
+    if (self.online && !self.isReconnectTimer) { //当前是在线，需要计时设置为离线
+        // 开始重连计时
+        [_offlineReconnectTimer setFireDate:[NSDate distantPast]];
+        //                    // 激活后台线程 重连超时大于10秒，才需要这两行代码
+        self.isReconnectTimer = YES; // 标志开始了重连计时
+        [common beginBackgroundTask];
+    }
+}
+
+- (void)appWasKilled {
     if (self.online) {
-        [self changeStatusToDisconnect];
-        
-        if (!_isGetSearchDeviceAck) { // 关闭蓝牙的时候，肯定接受不到设备的回复，如果按钮有正在查找设备的动画，需要关闭
-            [[NSNotificationCenter defaultCenter] postNotificationName:DeviceGetAckFailedNotification object:nil];
-        }
+        [self changeStatusToDisconnect:NO];
     }
 }
 
@@ -760,9 +726,7 @@
     if (_online) {
         return @"Last seen just now";
     }
-    else {
-        [self compareOfflineTimer];
-    }
+    [self compareOfflineTimer];
     return _offlineTimeInfo;
 }
 
@@ -783,7 +747,7 @@
     NSInteger minute = comp.minute;
     NSInteger second = comp.second;
     if (year == 0 && mouth == 0 && day == 0 && hour == 0 && minute == 0) {
-        _offlineTimeInfo = [NSString stringWithFormat:@"Last seen %zd second ago", second];
+        _offlineTimeInfo = [NSString stringWithFormat:@"Last seen %zd seconds ago", second];
         return;
     }
     if (year == 0 && mouth == 0 && day == 0 && hour == 0) {
@@ -827,11 +791,93 @@
     _searchDeviceackDelayTimer = nil;
 }
 
+#pragma mark - 手机报警
+- (void)playSearchPhoneSound {
+    NSNumber *phoneAlertMusic = [[NSUserDefaults standardUserDefaults] objectForKey:PhoneAlertMusicKey];
+    NSString *alertMusic;
+    switch (phoneAlertMusic.integerValue) {
+        case 2:
+            alertMusic = @"voice2.mp3";
+            break;
+        case 3:
+            alertMusic = @"voice3.mp3";
+            break;
+        default:
+            alertMusic = @"voice1.mp3";
+            break;
+    }
+    NSString *musicPath = [[NSBundle mainBundle] pathForResource:alertMusic ofType:nil];
+    NSURL *fileURL = [NSURL fileURLWithPath:musicPath];
+    // 设置后台播放代码
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    // 这个进入后台10秒钟后播放没声音
+    //    [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
+    // 这个可以在后台播放
+    [audioSession setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
+    [audioSession setActive:YES error:nil];
+    NSError *error = nil;
+    self.searchPhonePlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&error];
+    self.searchPhonePlayer.delegate = self;
+    self.searchPhonePlayer.numberOfLoops = 300;
+    self.searchPhonePlayer.volume = 1.0;
+    [self.searchPhonePlayer play];
+    [common startSharkAnimation]; //关闭闪光灯
+}
+
+- (void)stopSearchPhoneSound {
+    [common stopSharkAnimation]; //打开闪光灯
+    if (self.searchPhonePlayer.isPlaying) {
+        [self.searchPhonePlayer stop];
+    }
+}
+
+#pragma mark - 离线提示音
+- (void)playOfflineSound {
+    if (self.offlinePlayer.isPlaying) {
+        return;
+    }
+    NSNumber *phoneAlertMusic = [[NSUserDefaults standardUserDefaults] objectForKey:PhoneAlertMusicKey];
+    NSString *alertMusic;
+    switch (phoneAlertMusic.integerValue) {
+        case 2:
+            alertMusic = @"voice2.mp3";
+            break;
+        case 3:
+            alertMusic = @"voice3.mp3";
+            break;
+        default:
+            alertMusic = @"voice1.mp3";
+            break;
+    }
+    NSString *musicPath = [[NSBundle mainBundle] pathForResource:alertMusic ofType:nil];
+    NSURL *fileURL = [NSURL fileURLWithPath:musicPath];
+    // 设置后台播放代码
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    // 这个可以在后台播放
+    [audioSession setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDuckOthers error:nil];
+    [audioSession setActive:YES error:nil];
+    NSError *error = nil;
+    self.offlinePlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&error];
+    self.offlinePlayer.delegate = self;
+    self.offlinePlayer.numberOfLoops = 1;
+    self.offlinePlayer.volume = 1.0;
+    [self.offlinePlayer play];
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+}
+
+- (void)stopOfflineSound {
+    if (self.offlinePlayer.isPlaying) {
+        [self.offlinePlayer stop];
+    }
+}
 
 #pragma mark - Properity
 - (void)setPeripheral:(CBPeripheral *)peripheral {
     if ([_peripheral.identifier.UUIDString isEqualToString:peripheral.identifier.UUIDString]) {
-        // 已经赋值过的设备不需要重新设置
+        [_peripheral setDelegate:nil];
+        _peripheral = peripheral;
+        NSLog(@"为设备更换新的peripheral对象: %@", peripheral);
+        [peripheral setDelegate:self];
         return;
     }
     self.online = NO;
@@ -864,9 +910,8 @@
     if (_deviceName.length == 0) {
         _deviceName = self.peripheral.name;
     }
-    if (_deviceName.length == 0 || [_deviceName isEqualToString:@"Lily"] || [_deviceName isEqualToString:@"Innway Card"]) {
-        _deviceName = @"Card Holder";
-        
+    if (_deviceName.length == 0 || [_deviceName isEqualToString:@"Lily"]) {
+        _deviceName = @"Innway Card";
     }
     return _deviceName;
 }
@@ -881,11 +926,22 @@
     }
 }
 
-- (BOOL)connected {
+
+- (BOOL)connecting {
     if ([DLCentralManager sharedInstance].state != CBCentralManagerStatePoweredOn) {
         return NO;
     }
     if (_peripheral && (_peripheral.state == CBPeripheralStateConnected || _peripheral.state == CBPeripheralStateConnecting)) {
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)connected {
+    if ([DLCentralManager sharedInstance].state != CBCentralManagerStatePoweredOn) {
+        return NO;
+    }
+    if (_peripheral && (_peripheral.state == CBPeripheralStateConnected)) {
         return YES;
     }
     return NO;
@@ -896,6 +952,26 @@
         _rssiValues = [NSMutableArray array];
     }
     return _rssiValues;
+}
+
+- (void)setIsSearchPhone:(BOOL)isSearchPhone {
+    _isSearchPhone = isSearchPhone;
+    if (isSearchPhone) {
+        [self playSearchPhoneSound];
+    }
+    else {
+        [self stopSearchPhoneSound];
+    }
+}
+
+- (void)setIsOfflineSounding:(BOOL)isOfflineSounding {
+    _isOfflineSounding = isOfflineSounding;
+    if (isOfflineSounding) {
+        [self playOfflineSound];
+    }
+    else {
+        [self stopOfflineSound];
+    }
 }
 
 @end

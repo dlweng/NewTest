@@ -15,6 +15,8 @@
 
 #define common [InCommon sharedInstance]
 #define ApplicationWillEnterForeground @"ApplicationWillEnterForeground"
+#define ApplicationDidEnterBackground @"ApplicationDidEnterBackground"
+
 
 /**
  界面显示类型
@@ -82,18 +84,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendLocalNotification:(NSString *)message;
 + (BOOL)isOpenNotification;
 
-// 查找手机的提示音
-- (void)playSoundAlertMusic;
-- (void)stopSoundAlertMusic;
-// 设置闪光灯 打开的时候关闭，关闭的时候打开
-- (void)setupSharkLight;
-
-// 设备离线提示音
-- (void)playSound;
 
 - (NSString *)getImageName:(NSNumber *)rssi;
 + (BOOL)isIPhoneX; // 返回是否是刘海屏
 - (void)goToAPPSetupView;
+
+//后台任务
+- (BOOL)beginBackgroundTask;
+- (void)endBackgrondTask;
+
+@property (nonatomic, assign) BOOL isSharkAnimationing;
+- (void)startSharkAnimation;
+- (void)stopSharkAnimation;
 
 @end
 
