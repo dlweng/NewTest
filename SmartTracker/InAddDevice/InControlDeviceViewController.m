@@ -197,7 +197,7 @@
 
 - (void)setupControlDeviceBtnText {
     NSString *deviceName = self.device.deviceName;
-    [self.controlDeviceBtn setTitle:[NSString stringWithFormat:@"Ring %@", deviceName] forState:UIControlStateNormal];
+    [self.controlDeviceBtn setTitle:[NSString stringWithFormat:@"%@", deviceName] forState:UIControlStateNormal];
 }
 
 - (void)addDeviceListView {

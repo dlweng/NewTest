@@ -30,7 +30,7 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lily" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eec-Tj-d5Q">
-                        <rect key="frame" x="115" y="8.5" width="29" height="23"/>
+                        <rect key="frame" x="115" y="8.5" width="117" height="23"/>
                         <fontDescription key="fontDescription" type="system" pointSize="19"/>
                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
@@ -88,6 +88,7 @@
                     <constraint firstItem="eec-Tj-d5Q" firstAttribute="centerY" secondItem="7or-9c-kQW" secondAttribute="centerY" constant="-10" id="Mju-4D-Xgq"/>
                     <constraint firstItem="UCe-5T-RAX" firstAttribute="leading" secondItem="zfY-9c-UiS" secondAttribute="trailing" constant="4" id="NNG-Cj-WBz"/>
                     <constraint firstAttribute="bottom" secondItem="PXt-4i-vwt" secondAttribute="bottom" id="PeY-dE-vbb"/>
+                    <constraint firstItem="UCe-5T-RAX" firstAttribute="leading" secondItem="eec-Tj-d5Q" secondAttribute="trailing" constant="4" id="QPz-9d-5Ti"/>
                     <constraint firstAttribute="trailing" secondItem="G5T-g7-5Vj" secondAttribute="trailing" id="RCy-mu-fL9"/>
                     <constraint firstItem="G5T-g7-5Vj" firstAttribute="leading" secondItem="UCe-5T-RAX" secondAttribute="trailing" constant="-2" id="Rmy-Cu-Npz"/>
                     <constraint firstItem="PXt-4i-vwt" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="UAA-Zv-8bj"/>
