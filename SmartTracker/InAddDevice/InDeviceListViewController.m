@@ -13,13 +13,13 @@
 #import "InDeviceListCell.h"
 #import "InDeviceListAddDeviceCell.h"
 #import "InCommon.h"
+#import "NSTimer+InTimer.h"
 
 @interface InDeviceListViewController ()<UITableViewDelegate, UITableViewDataSource, InDeviceListCellDelegate, DLDeviceDelegate> {
     NSTimer *_offlineTimer;
 }
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (nonatomic, strong) NSDictionary *cloudList;
 @property (weak, nonatomic) IBOutlet UIView *upDownView;
 @property (nonatomic, assign) CGPoint oldPoint;
 @property (weak, nonatomic) IBOutlet UIImageView *upDownImage;
@@ -31,7 +31,6 @@
 + (instancetype)deviceListViewController {
     InDeviceListViewController *menuVC = [[InDeviceListViewController alloc] init];
     menuVC.tableView.backgroundColor = [UIColor redColor];
-    menuVC.cloudList = [NSMutableArray array];
     return menuVC;
 }
 
@@ -45,7 +44,7 @@
     self.tableView.backgroundColor = [UIColor clearColor];
     
     self.upDownView.userInteractionEnabled = YES;
-//    [self.upDownView addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(upDown:)]];
+
     // 添加点击手势
     [self.upDownView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(upDown:)]];
     [self.upDownView addGestureRecognizer:[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(upDown:)]];
@@ -59,11 +58,18 @@
     
     self.down = YES;
     
-    _offlineTimer = [NSTimer timerWithTimeInterval:10 target:self.tableView selector:@selector(reloadData) userInfo:nil repeats:YES];
+    __weak typeof(self) weakSelf = self;
+    _offlineTimer = [NSTimer newTimerWithTimeInterval:10 repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [weakSelf.tableView reloadData];
+    }];
     [[NSRunLoop currentRunLoop] addTimer:_offlineTimer forMode:NSRunLoopCommonModes];
     [_offlineTimer setFireDate:[NSDate distantPast]];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+}
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:DeviceOnlineChangeNotification object:nil];
@@ -146,22 +152,6 @@
 - (void)reloadView {
     [self.tableView reloadData];
 }
-
-
-//- (void)upDown:(UIPanGestureRecognizer *)pan {
-////    NSLog(@"pan = %@", [NSValue valueWithCGPoint:[pan locationInView:self.view]]);
-//    CGPoint point = [pan locationInView:self.view];
-//    if (self.down) {
-//        if (point.y > 0) {
-//            [self.delegate deviceListViewController:self moveDown:point.y];
-//        }
-//    }
-//    else {
-//        if (point.y < 0) {
-//            [self.delegate deviceListViewController:self moveDown:point.y];
-//        }
-//    }
-//}
 
 - (void)upDown:(UIPanGestureRecognizer *)pan {
     self.down = !self.down;

@@ -37,7 +37,6 @@
 @interface DLDevice : NSObject<CBPeripheralDelegate>
 @property (nonatomic, weak) id<DLDeviceDelegate> delegate;
 @property (nonatomic, strong) CBPeripheral *peripheral;
-@property (nonatomic, assign) NSInteger cloudID;
 @property (nonatomic, copy) NSString *mac;
 @property (nonatomic, copy) NSString *deviceName;
 @property (nonatomic, strong) NSNumber *rssi;

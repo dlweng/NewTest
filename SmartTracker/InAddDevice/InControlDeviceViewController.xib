@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,6 +18,7 @@
                 <outlet property="deviceListBackgroupView" destination="Xb7-vO-Ale" id="TWf-ak-8Ld"/>
                 <outlet property="deviceListBodyHeightConstraint" destination="uYh-Iz-OQN" id="cTH-hM-Rby"/>
                 <outlet property="deviceListBodyView" destination="gmk-bd-sj9" id="JrE-BD-6z6"/>
+                <outlet property="mapTopConstraint" destination="dBd-b4-TbC" id="dVu-e8-Px6"/>
                 <outlet property="mapView" destination="HvX-U1-FGR" id="pwG-uI-NM8"/>
                 <outlet property="topBodyView" destination="sFK-RS-0Zf" id="QXx-M0-Pnt"/>
                 <outlet property="topBodyViewTopConstraint" destination="HnA-z0-n5H" id="lgm-rz-uZq"/>
@@ -70,7 +72,7 @@
                                         <constraint firstAttribute="height" constant="55" id="7xZ-WM-QQs"/>
                                     </constraints>
                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
-                                    <state key="normal" title="Smart Card">
+                                    <state key="normal" title="Ring INNWAY CARD">
                                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>
@@ -106,13 +108,14 @@
                     </constraints>
                 </view>
             </subviews>
-            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="sFK-RS-0Zf" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="HnA-z0-n5H"/>
                 <constraint firstItem="sFK-RS-0Zf" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="jNt-YZ-ZJR"/>
                 <constraint firstAttribute="trailing" secondItem="sFK-RS-0Zf" secondAttribute="trailing" id="kVi-pe-CjS"/>
                 <constraint firstAttribute="bottom" secondItem="sFK-RS-0Zf" secondAttribute="bottom" id="uJL-U3-S1Y"/>
             </constraints>
+            <viewLayoutGuide key="safeArea" id="ypk-wY-fAp"/>
             <point key="canvasLocation" x="37.600000000000001" y="59.820089955022496"/>
         </view>
     </objects>

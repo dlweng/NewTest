@@ -536,6 +536,7 @@
         }];
     }
     else {
+        self.reconnectNum = 0; //初始化重连基数
         NSLog(@"已经重连%d次, 不再去重连:%@", self.reconnectNum, self.mac);
         
     }
@@ -555,6 +556,7 @@
         }
         [self stopReconnectTimer];
     }
+    
 }
 
 - (void)stopReconnectTimer {

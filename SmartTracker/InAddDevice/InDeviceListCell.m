@@ -8,15 +8,20 @@
 
 #import "InDeviceListCell.h"
 #import "InCommon.h"
+#import "DLCloudDeviceManager.h"
 
 @interface InDeviceListCell ()
 @property (weak, nonatomic) IBOutlet UIImageView *alertImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *batteryImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *rssiView;
 @property (weak, nonatomic) IBOutlet UIImageView *cardView;
+@property (weak, nonatomic) IBOutlet UIView *bgView;
+
 
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
+@property (weak, nonatomic) IBOutlet UIButton *moreBtn;
+
 @end
 
 @implementation InDeviceListCell
@@ -24,6 +29,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.deviceSettingBtn.transform = CGAffineTransformRotate(self.deviceSettingBtn.transform, M_PI * 0.5);
+    self.moreBtn.layer.transform = CATransform3DRotate(self.moreBtn.layer.transform, M_PI * 0.5, 0, 0, 1);
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -98,36 +104,18 @@
         }
         self.batteryImageView.hidden = NO;
          [self.batteryImageView setImage:[UIImage imageNamed:batteryImageName]];
-//        if (batteryImageName.integerValue == 5) {
-//            self.batteryImageView.hidden = YES;
-//            self.alertImageView.hidden = NO;
-//        }
-//        else {
-//            self.alertImageView.hidden = YES;
-//            self.batteryImageView.hidden = NO;
-//            [self.batteryImageView setImage:[UIImage imageNamed:batteryImageName]];
-//        }
     }
 }
 
 - (void)setBeSelected:(BOOL)beSelected {
+    NSArray *deviceList = [[DLCloudDeviceManager sharedInstance].cloudDeviceList copy];
     _beSelected = beSelected;
-    UIColor *color = [UIColor whiteColor];
-    if (beSelected) {
-        color = [UIColor colorWithRed:80.0/255.0f green:179.0/255.0f blue:122/255.0f alpha:1];
+    UIColor *color = [UIColor clearColor];
+    if (beSelected && deviceList.count > 1) {
+        color = [UIColor colorWithRed:164.0/255.0 green:164.0/255.0 blue:164.0/255.0 alpha:0.5];
     }
-    self.timeLabel.textColor = color;
-    self.titleLabel.textColor = color;
+    self.bgView.backgroundColor = color;
 }
 
-//- (void)setBeSelected:(BOOL)beSelected {
-//    _beSelected = beSelected;
-//    if (beSelected) {
-//        self.contentView.backgroundColor = [UIColor colorWithWhite:1 alpha:0.7];
-//    }
-//    else {
-//        self.contentView.backgroundColor = [UIColor clearColor];
-//    }
-//}
 
 @end

@@ -8,7 +8,7 @@
 
 #import "InSelectionViewController.h"
 #import "InSearchDeviceViewController.h"
-#import "InCommon.h"
+#import "inCommon.h"
 #import "DLCloudDeviceManager.h"
 
 @interface InSelectionViewController ()<UITableViewDelegate, UITableViewDataSource>
@@ -33,7 +33,6 @@
     self.arr = @[@{@"image": @"SmartCardHolder", @"title": @"Smart Card Holder"},
                  @{@"image": @"SmartCard", @"title": @"Smart Card"}];
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
-    
     self.navigationItem.title = @"Add a new smart card";
     if ([DLCloudDeviceManager sharedInstance].cloudDeviceList.count > 0) {
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_back"] style:UIBarButtonItemStylePlain target:self action:@selector(goBack)];
@@ -71,7 +70,6 @@
     NSDictionary *dic = self.arr[indexPath.row];
     cell.imageView.image = [UIImage imageNamed:dic[@"image"]];
     cell.textLabel.text = dic[@"title"];
-    cell.textLabel.textColor = [UIColor darkGrayColor];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
 }

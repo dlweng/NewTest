@@ -14,11 +14,13 @@
 #import <MapKit/MapKit.h>
 #import "InCommon.h"
 #import "InSelectionViewController.h"
-#import "InSelectionViewController.h"
 #import <AVFoundation/AVFoundation.h>
+#import "NSTimer+InTimer.h"
+#import "InCameraViewController.h"
 #define coverViewAlpha 0.85  // 覆盖层的透明度
 
-@interface InControlDeviceViewController ()<DLDeviceDelegate, InDeviceListViewControllerDelegate, MKMapViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+@interface InControlDeviceViewController ()<DLDeviceDelegate, InDeviceListViewControllerDelegate, MKMapViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, InCameraViewControllerDelegate>
+
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topBodyViewTopConstraint;
 @property (weak, nonatomic) IBOutlet UIView *topBodyView;
@@ -31,6 +33,7 @@
 @property (nonatomic, weak) UIViewController *settingVC;
 @property (nonatomic, strong) NSLayoutConstraint *settingViewLeftConstraint;
 @property (nonatomic, strong) NSLayoutConstraint *settingViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *mapTopConstraint;
 
 // 设备列表
 @property (weak, nonatomic) IBOutlet UIView *deviceListBodyView;
@@ -46,16 +49,6 @@
 // 显示设置界面的透明覆盖层
 @property (nonatomic, weak) UIView *coverView;
 
-// 拍照
-@property (strong, nonatomic) IBOutlet UIView *customTakePhotoView;
-@property (weak, nonatomic) IBOutlet UIView *imageBodyView;
-@property (weak, nonatomic) IBOutlet UIImageView *imageView;
-@property (strong,nonatomic)UIImagePickerController * imagePikerViewController;
-@property (nonatomic, strong) UIImagePickerController *libraryPikerViewController;
-//@property (nonatomic,strong)AVCaptureSession *captureSession;
-
-
-
 // 按钮闪烁动画
 @property (nonatomic, strong) NSTimer *animationTimer;
 @property (nonatomic, assign) BOOL isBtnAnimation; // 标识按钮动画是否开启
@@ -64,12 +57,14 @@
 @property (nonatomic, assign) BOOL inTakePhoto;
 // 标识当前正在查找手机的设备
 @property (nonatomic, strong) NSMutableDictionary *searchPhoneDevices;
+@property (nonatomic, strong) InCameraViewController *cameraVC;
 @end
 
 @implementation InControlDeviceViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     // 界面调整
     self.topBodyViewTopConstraint.constant += 64;
     if ([InCommon isIPhoneX]) { //iphonex
@@ -79,14 +74,21 @@
         self.controlBtnBottomConstraint.constant += 20;
     }
     
+    if ([UIScreen mainScreen].bounds.size.width >= 768) {
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
+            //解决iPad竖屏上方会有空白的问题
+            self.mapTopConstraint.constant -= 18;
+        }
+    }
+    
     // 设置按钮圆弧
     self.controlDeviceBtn.layer.masksToBounds = YES;
     self.controlDeviceBtn.layer.cornerRadius = 5;
     
+    // 设置界面
     [self setupNarBar];
     [self addDeviceListView];
-    [self setUpImagePiker];
-    [[DLCloudDeviceManager sharedInstance] autoConnectCloudDevice];
     
     //地图设置
     self.mapView.delegate = self;
@@ -99,22 +101,31 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(searchDeviceAlert:) name:DeviceSearchDeviceAlertNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopBtnAnimation) name:DeviceGetAckFailedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateUI) name:ApplicationWillEnterForeground object:nil];
-    
-    // 添加云端列表的监视
-    [[DLCloudDeviceManager sharedInstance] addObserver:self forKeyPath:@"cloudDeviceList" options:NSKeyValueObservingOptionNew context:nil];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didChangeOrientation) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     // 设置定时器
-    self.animationTimer = [NSTimer timerWithTimeInterval:0.4 target:self selector:@selector(showBtnAnimation) userInfo:nil repeats:YES];
+    __weak typeof(self) weakSelf = self;
+    self.animationTimer = [NSTimer newTimerWithTimeInterval:0.4 repeats:YES block:^(NSTimer * _Nonnull timer) {
+//        NSLog(@"按钮动画");
+        [weakSelf showBtnAnimation];
+    }];
     [[NSRunLoop currentRunLoop] addTimer:self.animationTimer forMode:NSRunLoopCommonModes];
     [self stopBtnAnimation];
     
+    // 隐私信息弹框提示
     if (![common isOpensLocation]) {
-        [InAlertView showAlertWithMessage:@"跳转到设置界面打开定位功能" confirmHanler:^{
+        [InAlertView showAlertWithMessage:@"Go to Location Services and allow the app to use your current location." confirmHanler:^{
             [common goToAPPSetupView];
         } cancleHanler:nil];
     }
-    
+    if (![InCommon isOpenNotification]) {
+        [InAlertView showAlertWithMessage:@"Go to Settings and enable Notifications to receive Find Your Phone and Separation alerts." confirmHanler:^{
+            [common goToAPPSetupView];
+        } cancleHanler:nil];
+    }
     self.searchPhoneDevices = [NSMutableDictionary dictionary];
+    
+    // 自动连接设备
+    [[DLCloudDeviceManager sharedInstance] autoConnectCloudDevice];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -139,12 +150,9 @@
     [self.deviceListVC reloadView];
     [self.device getDeviceInfo];
     [self updateUI];
-    // 在viewDidLoad设置没有效果
+    
+    // 设置是否显示用户位置
     self.mapView.showsUserLocation = YES;
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
 }
 
 - (void)dealloc {
@@ -153,7 +161,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:DeviceSearchPhoneNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:DeviceSearchDeviceAlertNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:DeviceGetAckFailedNotification object:nil];
-    [[DLCloudDeviceManager sharedInstance] removeObserver:self forKeyPath:@"cloudDeviceList"];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:ApplicationWillEnterForeground object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     [self.animationTimer invalidate];
     self.animationTimer = nil;
 }
@@ -162,6 +171,14 @@
 - (void)setupNarBar {
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_more"] style:UIBarButtonItemStylePlain target:self action:@selector(goToDeviceSettingVC)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_menu"] style:UIBarButtonItemStylePlain target:self action:@selector(goToGetPhoto)];
+}
+
+//进入设备设置界面
+- (void)goToDeviceSettingVC {
+    NSLog(@"进入设备设置界面");
+    InDeviceSettingViewController *vc = [InDeviceSettingViewController deviceSettingViewController];
+    vc.device = self.device;
+    [self safePushViewController:vc];
 }
 
 - (void)updateUI {
@@ -185,27 +202,37 @@
 - (void)addDeviceListView {
     self.deviceListVC = [InDeviceListViewController deviceListViewController];
     self.deviceListVC.delegate = self;
+    self.deviceListVC.selectDevice = self.device;
     [self addChildViewController:self.deviceListVC];
     [self.deviceListBodyView addSubview:self.deviceListVC.view];
     self.deviceListVC.view.frame = self.deviceListBodyView.bounds;
     [self deviceListViewController:self.deviceListVC moveDown:YES];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
-    NSLog(@"keyPath = %@发生改变, change = %@, object = %@",keyPath, change, object);
-}
-
 #pragma mark - Action
 //控制设备
 - (IBAction)controlDeviceBtnDidClick:(UIButton *)sender {
+    BOOL stopSound = NO;
     if (self.searchPhoneDevices.count > 0) {
-        // 清楚所有正在查找手机的设备信息
+        // 1.有设备正在查找手机，去关闭查找手机的声音
         for (NSString *mac in self.searchPhoneDevices.allKeys) {
             DLDevice *device = self.searchPhoneDevices[mac];
             device.isSearchPhone = NO;
         }
         [self.searchPhoneDevices removeAllObjects];
         [self stopSearchPhone];
+        stopSound = YES;
+    }
+    // 2.关闭离线警报
+    NSDictionary *cloudDeviceList = [[DLCloudDeviceManager sharedInstance].cloudDeviceList copy];
+    for (NSString *mac in cloudDeviceList) {
+        DLDevice *device = cloudDeviceList[mac];
+        if (device.isOfflineSounding) {
+            stopSound = YES;
+        }
+        device.isOfflineSounding = NO;
+    }
+    if (stopSound) {
         return;
     }
 //    NSLog(@"下发控制指令");
@@ -221,7 +248,7 @@
             [self startBtnAnimation];
             [self.device startSearchDeviceTimer]; // 开启查找需要监听，防止出现发送失败，一直在闪烁按钮的问题
         }
-        [self.device searchDevice];
+        [self.device searchDevice]; 
     }
     else {
         if (self.device.isSearchDevice) { // 离线状态，如果手机在查找设备，要去关闭按钮动画
@@ -232,16 +259,29 @@
 }
 
 //进入设备设置界面
-- (void)goToDeviceSettingVC {
+- (void)goToDeviceSettingVC:(DLDevice *)device {
     NSLog(@"进入设备设置界面");
     InDeviceSettingViewController *vc = [InDeviceSettingViewController deviceSettingViewController];
-    vc.device = self.device;
+    vc.device = device;
     [self safePushViewController:vc];
 }
 
 - (IBAction)toLocation {
     NSLog(@"开始定位");
-    [self.mapView setCenterCoordinate:self.mapView.userLocation.coordinate];
+    // 1.旧的方式
+    //    [self.mapView setCenterCoordinate:self.mapView.userLocation.coordinate];
+    // 2.新的方式，设置显示的范围
+    //设置地图中的的经度、纬度
+    CLLocationCoordinate2D center = self.mapView.userLocation.coordinate;
+    //设置地图显示的范围
+    MKCoordinateSpan span;
+    //地图显示范围越小，细节越清楚；
+    span.latitudeDelta = 0.01;
+    span.longitudeDelta = 0.01;
+    //创建MKCoordinateRegion对象，该对象代表地图的显示中心和显示范围
+    MKCoordinateRegion region = {center,span};
+    //设置当前地图的显示中心和显示范围
+    [self.mapView setRegion:region animated:YES];
 }
 
 - (IBAction)toSwitchMapMode {
@@ -267,7 +307,11 @@
     self.device = device;
     [self.device getDeviceInfo];
     [self updateUI];
-    [self toLocation];
+//    [self toLocation];
+}
+
+- (void)deviceSettingBtnDidClick:(DLDevice *)device {
+    [self goToDeviceSettingVC:device];
 }
 
 #pragma mark - deviceListDelegate
@@ -292,9 +336,6 @@
     if (down) {
         //往下
         CGFloat minHeight = 196;
-        //        if ([DLCloudDeviceManager sharedInstance].cloudDeviceList.count > 1) {
-        //            minHeight = 146;
-        //        }
         CGFloat maxMenuHeight = [UIScreen mainScreen].bounds.size.height * 0.5;
         heightConstant = minHeight - maxMenuHeight;
     }
@@ -302,12 +343,12 @@
         // 往上
         heightConstant = 0;
     }
+    __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.25 animations:^{
-        self.deviceListBodyHeightConstraint.constant = heightConstant;
+        weakSelf.deviceListBodyHeightConstraint.constant = heightConstant;
     }];
   
 }
-
 
 #pragma mark - Map
 -(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
@@ -334,15 +375,6 @@
     return nil;
 }
 
-- (void)goToLocationOfflineDevice:(UIButton *)btn {
-    for (NSString *mac in self.deviceAnnotation.allKeys) {
-        InAnnotation *annotation = self.deviceAnnotation[mac];
-        if (annotation.annotationView.rightCalloutAccessoryView == btn) {
-            [self goThereWithAddress:@"DJDS" andLat:[NSString stringWithFormat:@"%f", annotation.coordinate.latitude] andLon:[NSString stringWithFormat:@"%f", annotation.coordinate.longitude]];
-            NSLog(@"去定位离线设备的位置, %f, %f", annotation.coordinate.longitude, annotation.coordinate.latitude);
-        }
-    }
-}
 
 - (void)deviceChangeOnline:(NSNotification *)notification {
 //    NSLog(@"接收到设备:%@, 状态改变的通知: %@",  notification.object);
@@ -354,6 +386,21 @@
         return;
     }
     NSMutableDictionary *cloudDeviceList = [DLCloudDeviceManager sharedInstance].cloudDeviceList;
+    // 1.先删除已经不存在云端列表的设备大头针
+    NSMutableArray *removeArr = [NSMutableArray array];
+    for (NSString *mac in self.deviceAnnotation.allKeys) {
+        DLDevice *device = cloudDeviceList[mac];
+        if (!device) {
+            // 设备不存在，假如到删除列表
+            [removeArr addObject:mac];
+        }
+    }
+    for (NSString *mac in removeArr) {
+        InAnnotation *annotation = [self.deviceAnnotation objectForKey:mac];
+        [self.mapView removeAnnotation:annotation];
+        [self.deviceAnnotation removeObjectForKey:mac];
+    }
+    // 2.更新存在云端列表设备的大头针状态
     for (NSString *mac in cloudDeviceList.allKeys) {
         DLDevice *device = cloudDeviceList[mac];
         InAnnotation *annotation = [self.deviceAnnotation objectForKey:mac];
@@ -366,10 +413,11 @@
             annotation = [[InAnnotation alloc] init];
             annotation.title = [NSString stringWithFormat:@"%@", device.deviceName];
             annotation.coordinate = device.coordinate;
+            __weak typeof(self) weakSelf = self;
             [self reversGeocode:annotation.coordinate completion:^(NSString *str) {
                 annotation.subtitle = str;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.75 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [self.mapView selectAnnotation:annotation animated:YES];
+                    [weakSelf.mapView selectAnnotation:annotation animated:YES];
                 });
             }];
             annotation.device = device;
@@ -420,48 +468,19 @@
     }];
 }
 
--(BOOL)canOpenUrl:(NSString *)string {
-    
-    return  [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:string]];
-    
-}
 
 - (void)goThereWithAddress:(NSString *)address andLat:(NSString *)lat andLon:(NSString *)lon {
+    //跳转系统地图
+    CLLocationCoordinate2D loc = CLLocationCoordinate2DMake([lat doubleValue], [lon doubleValue]);
+    MKMapItem *currentLocation = [MKMapItem mapItemForCurrentLocation];
+    MKMapItem *toLocation = [[MKMapItem alloc] initWithPlacemark:[[MKPlacemark alloc] initWithCoordinate:loc addressDictionary:nil]];
+    [MKMapItem openMapsWithItems:@[currentLocation, toLocation]
+     
+                   launchOptions:@{MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving,
+                                   
+                                   MKLaunchOptionsShowsTrafficKey: [NSNumber numberWithBool:YES]}];
     
-    if ([self canOpenUrl:@"baidumap://"]) {///跳转百度地图
-        
-        NSString *urlString = [[NSString stringWithFormat:@"baidumap://map/direction?origin={{我的位置}}&destination=latlng:%@,%@|name=%@&mode=driving&coord_type=bd09ll",lat, lon,address] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
-        
-        return;
-        
-    }else if ([self canOpenUrl:@"iosamap://"]) {///跳转高德地图
-        
-        NSString *urlString = [[NSString stringWithFormat:@"iosamap://navi?sourceApplication=%@&backScheme=%@&lat=%@&lon=%@&dev=0&style=2",@"神骑出行",@"TrunkHelper",lat, lon] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
-        
-        return;
-        
-    }else{////跳转系统地图
-        
-        CLLocationCoordinate2D loc = CLLocationCoordinate2DMake([lat doubleValue], [lon doubleValue]);
-        
-        MKMapItem *currentLocation = [MKMapItem mapItemForCurrentLocation];
-        
-        MKMapItem *toLocation = [[MKMapItem alloc] initWithPlacemark:[[MKPlacemark alloc] initWithCoordinate:loc addressDictionary:nil]];
-        
-        [MKMapItem openMapsWithItems:@[currentLocation, toLocation]
-         
-                       launchOptions:@{MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving,
-                                       
-                                       MKLaunchOptionsShowsTrafficKey: [NSNumber numberWithBool:YES]}];
-        
-        return;
-        
-    }
-    
+    return;
 }
 
 - (void)deviceRSSIChange:(NSNotification *)noti {
@@ -488,139 +507,20 @@
 
 #pragma mark - Take photo
 - (void)goToGetPhoto {
-//    NSLog(@"去获取图片");
-    self.imagePikerViewController.sourceType = UIImagePickerControllerSourceTypeCamera;
-    self.imagePikerViewController.showsCameraControls = NO;
-    [[NSBundle mainBundle] loadNibNamed:@"InCustomTablePhotoVuew" owner:self options:nil];
-    self.customTakePhotoView.frame = self.imagePikerViewController.cameraOverlayView.frame;
-    self.customTakePhotoView.backgroundColor = [UIColor clearColor];
-    self.imagePikerViewController.cameraOverlayView = self.customTakePhotoView;
-    self.customTakePhotoView = nil;
-    [self presentViewController:self.imagePikerViewController animated:YES completion:NULL];
-    self.imageBodyView.hidden = YES;
+    self.cameraVC = [[InCameraViewController alloc] init];
+    self.cameraVC.delegate = self;
+    [self presentViewController:self.cameraVC animated:YES completion:nil];
     self.inTakePhoto = YES;
 }
 
-- (void)setUpImagePiker {
-    // 设置相机的
-    self.imagePikerViewController = [[UIImagePickerController alloc] init];
-    self.imagePikerViewController.delegate = self;
-    self.imagePikerViewController.allowsEditing = YES;
-    // 设置相册的
-    self.libraryPikerViewController = [[UIImagePickerController alloc] init];
-    self.libraryPikerViewController.delegate = self;
-    self.libraryPikerViewController.allowsEditing = YES;
-    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    // 设置相册的导航栏
-    [self.libraryPikerViewController.navigationBar setBarTintColor:[UIColor clearColor]];
-    [self.libraryPikerViewController.navigationBar setTranslucent:NO];
-    [self.libraryPikerViewController.navigationBar setTintColor:[UIColor whiteColor]];
-#warning 看是否需要设置导航栏
-//    [InCommon setNavgationBar:self.libraryPikerViewController.navigationBar];
-//    // 设置标题颜色
-//    NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
-//    attrs[NSForegroundColorAttributeName] = [UIColor whiteColor];
-//    [self.libraryPikerViewController.navigationBar setTitleTextAttributes:attrs];
-}
-- (IBAction)setPhotoSharkLight {
-    NSLog(@"设置闪光灯");
-//    [common setupSharkLight];
+- (void)cameraViewControllerDidChangeToLibrary:(BOOL)isLibrary {
+    NSLog(@"相机与相册界面在切换: %d",  isLibrary);
+    self.inTakePhoto = !isLibrary;
 }
 
-- (IBAction)changeCameraDirection {
-    NSLog(@"改变相机的方向");
-//    [self swapFrontAndBackCameras];
-}
-
-//// 切换前后置摄像头
-//- (AVCaptureDevice *)cameraWithPosition:(AVCaptureDevicePosition)position
-//{
-//    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-//    for (AVCaptureDevice *device in devices )
-//        if ( device.position == position )
-//            return device;
-//    return nil;
-//}
-//
-//- (void)swapFrontAndBackCameras {
-//    NSArray *inputs =self.captureSession.inputs;
-//    for (AVCaptureDeviceInput *input in inputs) {
-//        AVCaptureDevice *device = input.device;
-//        if ([device hasMediaType:AVMediaTypeVideo]) {
-//            AVCaptureDevicePosition position = device.position;
-//            AVCaptureDevice *newCamera =nil;
-//            AVCaptureDeviceInput *newInput =nil;
-//            if (position ==AVCaptureDevicePositionFront)
-//            {
-//                NSLog(@"当前是前置摄像头，要切换到后置摄像头");
-//                newCamera = [self cameraWithPosition:AVCaptureDevicePositionBack];
-//            }
-//            else
-//            {
-//                NSLog(@"当前是后置摄像头，要切换到前置摄像头");
-//                newCamera = [self cameraWithPosition:AVCaptureDevicePositionFront];
-//            }
-//            newInput = [AVCaptureDeviceInput deviceInputWithDevice:newCamera error:nil];
-//            [self.captureSession beginConfiguration];
-//            [self.captureSession removeInput:input];
-//            [self.captureSession addInput:newInput];
-//            [self.captureSession commitConfiguration];
-//            break;
-//        }
-//    }
-//}
-
-- (IBAction)goPhotoLibrary {
-    NSLog(@"进入相册");
-    // 解决iPhone5S上导航栏会消失的Bug
-    [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    self.libraryPikerViewController.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
-    [self.imagePikerViewController presentViewController:self.libraryPikerViewController animated:YES completion:NULL];
+- (void)cameraViewControllerDidClickGoBack:(InCameraViewController *)vc {
     self.inTakePhoto = NO;
-}
-
-- (IBAction)takePhoto {
-    NSLog(@"拍照保存");
-    [self.imagePikerViewController takePicture];
-}
-
-- (IBAction)takePhotoBack {
-    NSLog(@"拍完照返回");
-    [self dismissViewControllerAnimated:YES completion:NULL];
-    self.inTakePhoto = NO;
-}
-
-- (void)goBackTakePhotoView {
-    [self.imagePikerViewController dismissViewControllerAnimated:YES completion:nil];
-    self.inTakePhoto = YES;
-}
-
--(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
-    if (picker == self.libraryPikerViewController) {
-//        self.imageBodyView.hidden = NO;
-        // 相册界面点击图片显示
-//        UIImage * image = info[UIImagePickerControllerOriginalImage];
-//        self.imageView.image = image;
-        [self goBackTakePhotoView];
-        return;
-    }
-    else if (picker == self.imagePikerViewController) {
-        // 相机拍完照进入保存
-        UIImage * image = info[UIImagePickerControllerEditedImage];
-        if (!image) {
-            image = info[UIImagePickerControllerOriginalImage];
-        }
-//        self.imageView.image = image;
-        UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSaveImageWithError:contextInfo:), (__bridge void *)self);
-    }
-}
-
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [self goBackTakePhotoView];
-}
-
-- (void)image:(UIImage *)image didFinishSaveImageWithError:(NSError *)error contextInfo:(void *)contextInfo {
-    NSLog(@"保存图片结果: image = %@, error = %@, contextInfo = %@", image, error, contextInfo);
+    [self.cameraVC dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - 按钮动画
@@ -656,7 +556,7 @@
 
 - (void)searchPhone:(NSNotification *)noti {
     if (self.inTakePhoto) {
-        [self takePhoto];
+        [self.cameraVC takeAPhoto];
         return;
     }
     DLDevice *device = noti.userInfo[@"Device"];
@@ -667,14 +567,11 @@
     }
     else {
         if (self.searchPhoneDevices.count == 0) {
-            // 只有在当前没有声音和闪光动画的时候才需要去开启
-//            [common playSoundAlertMusic];
+            // 只有当前没有设备在查找手机的时候才去开启动画
             [self startBtnAnimation];
-        }
-        
+        }   
         device.isSearchPhone = YES;
-        [self.searchPhoneDevices setValue:device forKey:device.mac];
-        
+        [self.searchPhoneDevices setValue:device forKey:device.mac];        
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
             // 发送本地通知
             [common sendLocalNotification:[NSString stringWithFormat:@"%@ is finding iPhone now!", device.deviceName]];
@@ -684,7 +581,6 @@
 
 - (void)stopSearchPhone {
     if (self.searchPhoneDevices.count == 0) {
-//        [common stopSoundAlertMusic];
         [self stopBtnAnimation];
     }
 }
@@ -705,6 +601,21 @@
     }
 }
 
+#pragma mark - 旋转屏幕
+- (void)didChangeOrientation
+{
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
+        //解决横屏设备列表显示不全的问题
+        CGFloat maxMenuHeight = [UIScreen mainScreen].bounds.size.height * 0.5;
+        CGFloat minMenuHeigth = 196;
+        if (maxMenuHeight + self.deviceListBodyHeightConstraint.constant < minMenuHeigth) {
+            self.deviceListBodyHeightConstraint.constant = minMenuHeigth - maxMenuHeight;
+        }
+    }
+ 
+}
+
 #pragma mark - Properity
 - (NSMutableDictionary *)deviceAnnotation {
     if (!_deviceAnnotation) {
@@ -712,28 +623,5 @@
     }
     return _deviceAnnotation;
 }
-
-//- (AVCaptureSession *)captureSession
-//{
-//    if(_captureSession == nil)
-//    {
-//        _captureSession = [[AVCaptureSession alloc] init];
-//        //设置分辨率
-//        if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
-//            _captureSession.sessionPreset=AVCaptureSessionPreset1280x720;
-//        }
-//        
-//        //添加摄像头
-//        NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-//        NSLog(@"devices = %@", devices);
-//        for (AVCaptureDevice *device in devices) {
-//            AVCaptureDeviceInput *deviceInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:nil];
-//            if ([_captureSession canAddInput:deviceInput]){
-//                [_captureSession addInput:deviceInput];
-//            }
-//        }
-//    }
-//    return _captureSession;
-//}
 
 @end
