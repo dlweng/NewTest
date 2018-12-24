@@ -121,14 +121,16 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
             self.failedCardImageView.image = [UIImage imageNamed:@"successCardHolder"];
             self.searchCardImageView.image = [UIImage imageNamed:@"searchCardHolder"];
             self.navigationItem.title = @"Add a new smart card holder";
+            self.successMessageLabel.text = @"Found Smart Card Holder";
             break;
         }
         case InDeviceSmartCard:
         {
             self.successCardImageView.image = [UIImage imageNamed:@"failedCard"];
             self.failedCardImageView.image = [UIImage imageNamed:@"failedCard"];
-            self.searchCardImageView.image = [UIImage imageNamed:@"searchCardHolder"];
+            self.searchCardImageView.image = [UIImage imageNamed:@"searchCard"];
             self.navigationItem.title = @"Add a new smart card";
+            self.successMessageLabel.text = @"Found Smart Card";
             break;
         }
         default:
@@ -179,8 +181,8 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
         self.messageBodyViewHeightConstraing.constant = 120;
         self.phoneOptionViewHeightConstraint.constant = 70;
         self.confirmBtnTopConstraint.constant = 0;
-        self.titleLabel.text = @"you can:";
-        message = @"1. Turn off and then turn on Bluetooth.\n2. Hold the button on the Smart card and check if can hear a beep sound.\n3. Near the Smart card to your phone";
+        self.titleLabel.text = @"you can";
+        message = @"• Turn off and then turn on Bluetooth.\n• Hold the button on the Smart card and check if can hear a beep sound.\n• Near the Smart card to your phone";
     }
     NSMutableParagraphStyle  *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
     [paragraphStyle  setLineSpacing:5];

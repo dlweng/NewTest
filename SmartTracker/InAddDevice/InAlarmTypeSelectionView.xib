@@ -109,9 +109,9 @@
             <connections>
                 <outlet property="bodyView" destination="22R-Ic-9Fm" id="XhX-n2-uPh"/>
                 <outlet property="bodyViewHeigthConstraint" destination="qSW-8S-crg" id="rH4-Rd-XSz"/>
-                <outlet property="cancelBtn" destination="z2z-aU-aSP" id="1Wf-sh-gfi"/>
+                <outlet property="cancelBtn" destination="z2z-aU-aSP" id="obc-Dq-RIY"/>
                 <outlet property="cancelBtnWidthConstraint" destination="PCO-gs-Kzs" id="Vke-6E-ETY"/>
-                <outlet property="confirmBtn" destination="9qA-MQ-COG" id="FZG-OC-iHL"/>
+                <outlet property="confirmBtn" destination="9qA-MQ-COG" id="TVj-BC-cxi"/>
                 <outlet property="confirmBtnWidthConstraint" destination="giA-Kd-cs6" id="1l8-TM-scA"/>
                 <outlet property="tableView" destination="lLy-iq-Xum" id="VYi-fY-jtz"/>
                 <outlet property="tableViewHeightConstraint" destination="JOG-Wl-dNY" id="L68-gA-Yo3"/>

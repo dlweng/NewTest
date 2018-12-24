@@ -17,6 +17,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import "NSTimer+InTimer.h"
 #import "InCameraViewController.h"
+#import "InDeviceSettingViewController2.h"
 #define coverViewAlpha 0.85  // 覆盖层的透明度
 
 @interface InControlDeviceViewController ()<DLDeviceDelegate, InDeviceListViewControllerDelegate, MKMapViewDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate, InCameraViewControllerDelegate>
@@ -261,7 +262,7 @@
 //进入设备设置界面
 - (void)goToDeviceSettingVC:(DLDevice *)device {
     NSLog(@"进入设备设置界面");
-    InDeviceSettingViewController *vc = [InDeviceSettingViewController deviceSettingViewController];
+    InDeviceSettingViewController2 *vc = [[InDeviceSettingViewController2 alloc] init];
     vc.device = device;
     [self safePushViewController:vc];
 }

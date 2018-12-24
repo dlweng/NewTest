@@ -381,7 +381,7 @@ static pthread_rwlock_t _connectDeviceEventHandler = PTHREAD_RWLOCK_INITIALIZER;
                 [mac appendString:[tempStr substringWithRange:NSMakeRange(9, 2)]];
                 [mac appendString:@":"];
                 [mac appendString:[tempStr substringWithRange:NSMakeRange(11, 2)]];
-                return mac;
+                return [mac uppercaseString];
             }
         }
     }

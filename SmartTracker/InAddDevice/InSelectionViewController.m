@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong) NSArray *arr;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+
 @property (nonatomic, strong) void(^comeback)(void);
 
 @end

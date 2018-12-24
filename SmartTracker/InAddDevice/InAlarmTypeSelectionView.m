@@ -22,8 +22,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *confirmBtn;
 @property (weak, nonatomic) IBOutlet UIButton *cancelBtn;
 
-
-
 @end
 
 @implementation InAlarmTypeSelectionView
@@ -52,7 +50,6 @@
         }
         self.bodyViewHeigthConstraint.constant += 100;
         self.tableViewHeightConstraint.constant += 100;
-        
         [InCommon setUpBlackStyleButton:self.confirmBtn];
         [InCommon setUpWhiteStyleButton:self.cancelBtn];
     }
@@ -73,15 +70,14 @@
     
     if (self.alarmType == InDeviceAlert) {
         switch (indexPath.row) {
-
             case 1:
-                cell.textLabel.text = @"Equipment alarm 2";
+                cell.textLabel.text = @"Alert 2";
                 break;
             case 2:
-                cell.textLabel.text = @"Equipment alarm 3";
+                cell.textLabel.text = @"Alert 3";
                 break;
             default:
-                cell.textLabel.text = @"Equipment alarm 1";
+                cell.textLabel.text = @"Alert 1";
                 break;
         }
     }
