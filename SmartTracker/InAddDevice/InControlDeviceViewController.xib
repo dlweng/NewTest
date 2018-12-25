@@ -72,7 +72,7 @@
                                         <constraint firstAttribute="height" constant="55" id="7xZ-WM-QQs"/>
                                     </constraints>
                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
-                                    <state key="normal" title="Ring INNWAY CARD">
+                                    <state key="normal" title="Smart CARD">
                                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>

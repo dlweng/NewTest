@@ -60,8 +60,8 @@ static DLCloudDeviceManager *instance = nil;
     DLKnowDevice *knowDevice = [[DLCentralManager sharedInstance].knownPeripherals objectForKey:mac];
     CBPeripheral *peripheral = knowDevice.peripheral;
     NSString *peripheralName = peripheral.name;
-    if (peripheralName.length == 0 || [peripheralName isEqualToString:@"Lily"] || [peripheralName isEqualToString:@"Innway Card"]) {
-        peripheralName = @"Card Holder";
+    if (peripheralName.length == 0 || [peripheralName isEqualToString:@"Lily"] || [peripheralName isEqualToString:@"Innway Card"] || [peripheralName isEqualToString:@"Smart Card Holder"]) {
+        peripheralName = @"Smart Card Holder";
     }
     // 添加设备时，将当前的时间和位置作为离线时间和位置上传
     NSString *gps = [common getCurrentGps];

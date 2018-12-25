@@ -183,8 +183,8 @@
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="20" id="uwm-bx-JuX"/>
                                                 </constraints>
                                             </imageView>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Found Innway Card" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O5d-f5-C8l">
-                                                <rect key="frame" x="110" y="88.5" width="155" height="21.5"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Found Smart Card" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O5d-f5-C8l">
+                                                <rect key="frame" x="113.5" y="88.5" width="148" height="21.5"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                 <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
@@ -396,6 +396,7 @@
                         <outlet property="failedBodyViewHeightConstraint" destination="Zz9-ZR-t8e" id="kga-xe-gHo"/>
                         <outlet property="failedCardImageView" destination="45b-ea-PUg" id="1rT-bG-QRp"/>
                         <outlet property="failedCardWidthConstrain" destination="rYr-mw-2Th" id="6fP-YC-uVQ"/>
+                        <outlet property="failedMessageLabel" destination="I9Z-c1-c97" id="JXz-w5-098"/>
                         <outlet property="messageBodyViewHeightConstraing" destination="AuE-1t-Ufl" id="rPs-KF-LEZ"/>
                         <outlet property="messageLabel" destination="kXk-nB-kjf" id="hca-Y1-1P2"/>
                         <outlet property="phoneBodyView" destination="HJT-Iz-Q9d" id="ARq-Kb-j3p"/>
@@ -424,7 +425,7 @@
         <image name="buyButton.png" width="237" height="45"/>
         <image name="failedCard.png" width="95" height="60"/>
         <image name="failedCheck.png" width="33" height="27"/>
-        <image name="searchCard.png" width="120" height="147"/>
+        <image name="searchCard.png" width="133" height="147"/>
         <image name="searchImage.png" width="45" height="46"/>
         <image name="searchPhone.png" width="72" height="151"/>
         <image name="successCard.png" width="95" height="60"/>

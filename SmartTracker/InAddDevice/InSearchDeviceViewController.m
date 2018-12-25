@@ -48,6 +48,8 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *sucessCardWidthConstrain;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *failedCardWidthConstrain;
 @property (weak, nonatomic) IBOutlet UILabel *successMessageLabel;
+@property (weak, nonatomic) IBOutlet UILabel *failedMessageLabel;
+
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *successbodyViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *failedBodyViewHeightConstraint;
 
@@ -122,6 +124,7 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
             self.searchCardImageView.image = [UIImage imageNamed:@"searchCardHolder"];
             self.navigationItem.title = @"Add a new smart card holder";
             self.successMessageLabel.text = @"Found Smart Card Holder";
+            self.failedMessageLabel.text = @"No Smart Card Holder Found";
             break;
         }
         case InDeviceSmartCard:
@@ -131,6 +134,7 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
             self.searchCardImageView.image = [UIImage imageNamed:@"searchCard"];
             self.navigationItem.title = @"Add a new smart card";
             self.successMessageLabel.text = @"Found Smart Card";
+            self.failedMessageLabel.text = @"No Smart Card Found";
             break;
         }
         default:

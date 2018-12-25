@@ -23,19 +23,19 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>APP需要使用蓝牙功能与设备通信</string>
+	<string>The app requires Bluetooth access to pair with the device.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>需要开启相机为您提供拍照功能</string>
+	<string>The app requires camera access to take photos.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>需要打开你的定位以获取设备的位置</string>
+	<string>he app requires location services access to obtain the location of the device.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>需要打开你的定位以获取设备的位置</string>
+	<string>he app requires location services access to obtain the location of the device.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>需要打开你的定位以获取设备的位置</string>
+	<string>he app requires location services access to obtain the location of the device.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>需要将图片保存至相册</string>
+	<string>The app requires photo library access to store photos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>需要打开相册为您提供图片浏览服务</string>
+	<string>The app requires photo library access to browse existing photos.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

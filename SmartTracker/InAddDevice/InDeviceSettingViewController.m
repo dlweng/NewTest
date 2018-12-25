@@ -17,8 +17,6 @@
 @interface InDeviceSettingViewController ()<UITableViewDataSource, UITableViewDelegate, DLDeviceDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UIButton *deleteDeviceBtn;
-@property (nonatomic, strong) UISwitch *disconnectAlertBtn;
 @property (nonatomic, assign) NSNumber *phoneAlertMusic;
 
 @end
@@ -35,11 +33,6 @@
     [super viewDidLoad];
     self.navigationItem.title = @"Device settings";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_back"] style:UIBarButtonItemStylePlain target:self action:@selector(goBack)];
-    
-    self.disconnectAlertBtn = [[UISwitch alloc] init];
-    [self.disconnectAlertBtn addTarget:self action:@selector(disconnectAlertBtnDidClick:) forControlEvents:UIControlEventValueChanged];
-    self.deleteDeviceBtn.layer.masksToBounds = YES;
-    self.deleteDeviceBtn.layer.cornerRadius = 10;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -59,25 +52,6 @@
     self.device.delegate = self;
 }
 
-- (IBAction)deleteDeviceBtnDidClick {
-    [InAlertView showAlertWithMessage:@"Unpair and delete device?" confirmHanler:^{
-        [self deleteDevice];
-    } cancleHanler:nil];
-}
-
-- (void)deleteDevice {
-    DLCloudDeviceManager *manager = [DLCloudDeviceManager sharedInstance];
-    [manager deleteDevice:self.device.mac];
-    if (self.navigationController.viewControllers.lastObject == self) {
-        [self.navigationController popViewControllerAnimated:YES];
-    }
-}
-
-- (void)disconnectAlertBtnDidClick: (UISwitch *)btn {
-    [self.device setDisconnectAlert:btn.isOn reconnectAlert:NO];
-}
-
-
 - (void)saveNewDeviceName:(NSString *)newDeviceName {
     // 保存设备名称
     self.device.deviceName = newDeviceName;
@@ -92,7 +66,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 4;
+    return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -101,8 +75,6 @@
         case 1:
         case 2:
             return 1;
-        case 3:
-            return 2;
         default:
             return 0;
     }
@@ -112,13 +84,11 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
         case 0:
-            return @"Device alarm";
-        case 1:
             return @"Device alarm sound";
-        case 2:
+        case 1:
             return @"";
-        case 3:
-            return @"Device details";
+//        case 2:
+//            return @"Device details";
         default:
             return @"";
     }
@@ -128,17 +98,14 @@
     NSString *sectionName = @"";
     switch (section) {
         case 0:
-            sectionName = @"    Device alarm";
-            break;
-        case 1:
             sectionName = @"    Device alarm sound";
             break;
-        case 2:
+        case 1:
             sectionName = @"";
             break;
-        case 3:
-            sectionName = @"    Device details";
-            break;
+//        case 2:
+//            sectionName = @"    Device details";
+//            break;
         default:
             break;
     }
@@ -150,7 +117,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (section == 2) {
+    if (section == 1 || section == 2) {
         return 0;
     }
     return 35;
@@ -165,14 +132,6 @@
     cell.detailTextLabel.font = [UIFont systemFontOfSize:15];
     switch (indexPath.section) {
         case 0:
-        {
-            cell.textLabel.text = @"Disconnect alarm";
-            cell.accessoryView = self.disconnectAlertBtn;
-            NSNumber *disconnectAlert = self.device.lastData[DisconnectAlertKey];
-            self.disconnectAlertBtn.on = disconnectAlert.boolValue;
-            break;
-        }
-        case 1:
         {
             self.phoneAlertMusic = [[NSUserDefaults standardUserDefaults] objectForKey:PhoneAlertMusicKey];
             cell.textLabel.text = @"Cell phone alarm sound";
@@ -189,25 +148,31 @@
             }
             break;
         }
-        case 2:
+        case 1:
         {
             cell.textLabel.text = @"Help Center";
             break;
         }
-        case 3:
+//        case 2:
+//        {
+//            switch (indexPath.row) {
+//                case 0:
+//                    cell.textLabel.text = @"Device Address";
+//                    cell.detailTextLabel.text = self.device.mac;
+//                    break;
+//                case 1:
+//                    cell.textLabel.text = @"Firmware";
+//                    cell.detailTextLabel.text = self.device.firmware;
+//                    break;
+//                default:
+//                    break;
+//            }
+//            break;
+//        }
+        case 2:
         {
-            switch (indexPath.row) {
-                case 0:
-                    cell.textLabel.text = @"Device Address";
-                    cell.detailTextLabel.text = self.device.mac;
-                    break;
-                case 1:
-                    cell.textLabel.text = @"Firmware";
-                    cell.detailTextLabel.text = self.device.firmware;
-                    break;
-                default:
-                    break;
-            }
+            cell.textLabel.text = @"APP Version";
+            cell.detailTextLabel.text = @"1.0.0";
             break;
         }
         default:
@@ -219,7 +184,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSString *title = @"Select device alert tone";
-    if (indexPath.section == 1) {
+    if (indexPath.section == 0) {
         InAlarmType alertType = InPhoneAlert;
         // 获取当前的报警声音
         NSInteger currentAlarmVoice = 0;
