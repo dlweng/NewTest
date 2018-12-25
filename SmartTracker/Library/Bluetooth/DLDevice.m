@@ -912,8 +912,8 @@
     if (_deviceName.length == 0) {
         _deviceName = self.peripheral.name;
     }
-    if (_deviceName.length == 0 || [_deviceName isEqualToString:@"Lily"]) {
-        _deviceName = @"Innway Card";
+    if (_deviceName.length == 0) {
+        _deviceName = @"Smart Card Holder";
     }
     return _deviceName;
 }

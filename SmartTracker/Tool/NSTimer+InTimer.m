@@ -1,9 +1,8 @@
 //
 //  NSTimer+InTimer.m
-//  Innway
 //
 //  Created by danlypro on 2018/12/7.
-//  Copyright © 2018 innwaytech. All rights reserved.
+//  Copyright © 2018 . All rights reserved.
 //
 
 #import "NSTimer+InTimer.h"

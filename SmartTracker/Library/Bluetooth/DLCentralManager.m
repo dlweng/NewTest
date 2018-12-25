@@ -249,7 +249,7 @@ static pthread_rwlock_t _connectDeviceEventHandler = PTHREAD_RWLOCK_INITIALIZER;
 //            D888 = <00000000 0014>;   // D888表示设备mac地址
 //        };
 //        kCBAdvDataServiceUUIDs =     (
-//                                      E001 // E001表示是innway的设备
+//                                      E001 // E001表示是Smart的设备
 //                                      );
 //    }
     if ([self effectivePeripheral:advertisementData]) {

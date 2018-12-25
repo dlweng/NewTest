@@ -95,14 +95,10 @@
     }
 #warning danly - 需要修改
     InDeviceType deviceType = InDeviceNone;
-    if ([peripheral.name isEqualToString:@"Innway Card"] || [peripheral.name isEqualToString:@"Lily"]) {
+    if ([peripheral.name isEqualToString:@"Smart Card Holder"]) {
         deviceType = InDeviceSmartCardHolder;
     }
-//    else if ([peripheral.name isEqualToString:@"Innway Chip"]) {
-//        deviceType = InDeviceChip;
-//    } else if ([peripheral.name isEqualToString:@"Innway Tag"]) {
-//        deviceType = InDeviceTag;
-//    }
+
     return deviceType;
 }
 
