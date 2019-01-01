@@ -24,6 +24,8 @@
 		190F86ED21D13BDD00854F40 /* InDeviceSettingViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 190F86EC21D13BDD00854F40 /* InDeviceSettingViewController2.m */; };
 		190F86F021D1499400854F40 /* searchCard@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 190F86EE21D1499400854F40 /* searchCard@2x.png */; };
 		190F86F121D1499400854F40 /* searchCard@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 190F86EF21D1499400854F40 /* searchCard@3x.png */; };
+		1921F5DF21DB8F0C000ED728 /* charge@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1921F5DD21DB8F0C000ED728 /* charge@3x.png */; };
+		1921F5E021DB8F0C000ED728 /* charge@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1921F5DE21DB8F0C000ED728 /* charge@2x.png */; };
 		1965914821CCB9300060525D /* DLDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 1965914421CCB92F0060525D /* DLDevice.m */; };
 		1965914921CCB9300060525D /* DLCentralManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1965914521CCB92F0060525D /* DLCentralManager.m */; };
 		1965914C21CCB9B50060525D /* NSTimer+InTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1965914A21CCB9B50060525D /* NSTimer+InTimer.m */; };
@@ -210,6 +212,8 @@
 		190F86EC21D13BDD00854F40 /* InDeviceSettingViewController2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InDeviceSettingViewController2.m; sourceTree = "<group>"; };
 		190F86EE21D1499400854F40 /* searchCard@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "searchCard@2x.png"; sourceTree = "<group>"; };
 		190F86EF21D1499400854F40 /* searchCard@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "searchCard@3x.png"; sourceTree = "<group>"; };
+		1921F5DD21DB8F0C000ED728 /* charge@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "charge@3x.png"; sourceTree = "<group>"; };
+		1921F5DE21DB8F0C000ED728 /* charge@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "charge@2x.png"; sourceTree = "<group>"; };
 		1965914421CCB92F0060525D /* DLDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLDevice.m; sourceTree = "<group>"; };
 		1965914521CCB92F0060525D /* DLCentralManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCentralManager.m; sourceTree = "<group>"; };
 		1965914621CCB92F0060525D /* DLCentralManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCentralManager.h; sourceTree = "<group>"; };
@@ -698,6 +702,8 @@
 				19BB9D2321B36942003C8A53 /* RSSI_5@3x.png */,
 				19BB9D2721B36943003C8A53 /* RSSI_6@2x.png */,
 				19BB9D2421B36942003C8A53 /* RSSI_6@3x.png */,
+				1921F5DE21DB8F0C000ED728 /* charge@2x.png */,
+				1921F5DD21DB8F0C000ED728 /* charge@3x.png */,
 				19BB9D0B21B36834003C8A53 /* 0@2x.png */,
 				19BB9D0121B36833003C8A53 /* 0@3x.png */,
 				19BB9D0A21B36834003C8A53 /* 10@2x.png */,
@@ -976,6 +982,7 @@
 				19A4228521AA7DA10001C063 /* Assets.xcassets in Resources */,
 				190F86D521D1362200854F40 /* photoCloseShark@2x.png in Resources */,
 				19A4230221AA91370001C063 /* icon_back.png in Resources */,
+				1921F5DF21DB8F0C000ED728 /* charge@3x.png in Resources */,
 				19BB9D6B21B383B0003C8A53 /* photoGreenCamera@2x.png in Resources */,
 				19BB9D2021B36834003C8A53 /* 10@2x.png in Resources */,
 				19A4232321AA9D980001C063 /* searchCardHolder@3x.png in Resources */,
@@ -1029,6 +1036,7 @@
 				19BB9D1321B36834003C8A53 /* 100@2x.png in Resources */,
 				19A422FD21AA8D8F0001C063 /* SmartCard@2x.png in Resources */,
 				196591D321CCC7300060525D /* InCameraViewController.xib in Resources */,
+				1921F5E021DB8F0C000ED728 /* charge@2x.png in Resources */,
 				19BB9D4421B36EA1003C8A53 /* icon_add_device@2x.png in Resources */,
 				19A422FE21AA8D8F0001C063 /* SmartCard@3x.png in Resources */,
 				19BB9D5621B382EE003C8A53 /* check@2x.png in Resources */,
