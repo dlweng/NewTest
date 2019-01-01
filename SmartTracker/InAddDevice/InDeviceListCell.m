@@ -102,6 +102,8 @@
                 batteryImageName = @"0";
             }
         }
+        // 78 79 84
+        self.batteryImageView.tintColor = [UIColor colorWithRed:78.0/255.0 green:79.0/255.0 blue:84.0/255.0 alpha:1];
         self.batteryImageView.hidden = NO;
          [self.batteryImageView setImage:[UIImage imageNamed:batteryImageName]];
     }

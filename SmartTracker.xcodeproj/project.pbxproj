@@ -474,11 +474,11 @@
 		1965916921CCC7300060525D /* PhotoLibrary */ = {
 			isa = PBXGroup;
 			children = (
-				1965916A21CCC7300060525D /* LibraryViewController.h */,
-				1965916B21CCC7300060525D /* LibraryImageCell.m */,
-				1965916C21CCC7300060525D /* LibraryViewController.m */,
-				1965916D21CCC7300060525D /* LibraryImageCell.xib */,
 				1965916E21CCC7300060525D /* LibraryImageCell.h */,
+				1965916B21CCC7300060525D /* LibraryImageCell.m */,
+				1965916D21CCC7300060525D /* LibraryImageCell.xib */,
+				1965916A21CCC7300060525D /* LibraryViewController.h */,
+				1965916C21CCC7300060525D /* LibraryViewController.m */,
 				1965916F21CCC7300060525D /* YBImageBrowser */,
 			);
 			path = PhotoLibrary;

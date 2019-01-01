@@ -146,13 +146,13 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
         self.failedBodyView.hidden = YES;
         self.tryAagainLabel.hidden = YES;
         self.phoneBodyView.hidden = NO;
-        self.messageBodyViewHeightConstraing.constant = 166;
+        self.messageBodyViewHeightConstraing.constant = 120;
         self.phoneOptionViewHeightConstraint.constant = 151;
         self.confirmBtnTopConstraint.constant = screenHeight / 18.0;
-        if (screenHeight == 568) {
-            self.confirmBtnTopConstraint.constant = screenHeight / 35.0;
-            self.phoneOptionViewHeightConstraint.constant = 140;
-        }
+//        if (screenHeight == 568) {
+//            self.confirmBtnTopConstraint.constant = screenHeight / 35.0;
+//            self.phoneOptionViewHeightConstraint.constant = 140;
+//        }
         [self.confirmBtn setTitle:@"Confirm" forState:UIControlStateNormal];
         self.titleLabel.text = @"Instructions:";
         message = @"1. Make sure to turn on your phone's Bluetooth.\n2. Hold the button on the Smart card 3 sec until your hear a beep and the led starts flashing.\n3. Hold the Smart card close to your phone.";
@@ -164,13 +164,13 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
         self.tryAagainLabel.hidden = YES;
         self.phoneBodyView.hidden = NO;
         [self.confirmBtn setTitle:@"Confirm" forState:UIControlStateNormal];
-        self.messageBodyViewHeightConstraing.constant = 166;
+        self.messageBodyViewHeightConstraing.constant = 120;
         self.phoneOptionViewHeightConstraint.constant = 151;
         self.confirmBtnTopConstraint.constant = screenHeight / 18.0;
-        if (screenHeight == 568) {
-            self.confirmBtnTopConstraint.constant = screenHeight / 35.0;
-            self.phoneOptionViewHeightConstraint.constant = 140;
-        }
+//        if (screenHeight == 568) {
+//            self.confirmBtnTopConstraint.constant = screenHeight / 35.0;
+//            self.phoneOptionViewHeightConstraint.constant = 140;
+//        }
         self.titleLabel.text = @"Successive instructions:";
         message = @"1. Make sure to turn on your phone's Bluetooth.\n2. Hold the button on the Smart card until your hear a beep and the led starts flashing.\n3. Hold the Smart card close to your phone.";
     }
