@@ -265,7 +265,7 @@
 //获取当前的时间 1980-01-01 00:00:01
 - (NSString *)getCurrentTime{
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"YYYY-MM-dd HH:mm:ss"];
+    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     NSDate *datenow = [NSDate date];
     NSString *currentTimeString = [formatter stringFromDate:datenow];
     return currentTimeString;
