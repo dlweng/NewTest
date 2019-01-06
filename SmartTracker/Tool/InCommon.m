@@ -93,13 +93,28 @@
     if (!peripheral) {
         return InDeviceNone;
     }
-#warning danly - 需要修改
     InDeviceType deviceType = InDeviceNone;
     if ([peripheral.name isEqualToString:@"Smart Card Holder"]) {
         deviceType = InDeviceSmartCardHolder;
     }
+    else if ([peripheral.name isEqualToString:@"Smart Card"]) {
+        deviceType = InDeviceSmartCard;
+    }
 
     return deviceType;
+}
+
+#pragma mark - flash
+- (void)saveFlashStatus:(BOOL)flashStatus {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setValue:@(!flashStatus) forKey:@"flashIsClose"];
+    [defaults synchronize];
+}
+
+- (BOOL)flashStatus {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    BOOL flashIsClose = [defaults boolForKey:@"flashIsClose"];
+    return !flashIsClose;
 }
 
 #pragma mark - 定位
@@ -386,6 +401,9 @@
 
 #pragma mark - 闪光灯动画
 - (void)startSharkAnimation {
+    if (!self.flashStatus) {
+        return;
+    }
     if (self.isSharkAnimationing) { //如果已经开始，断开
         return;
     }
@@ -493,21 +511,18 @@
 
 #pragma mark - 后台任务
 - (BOOL)beginBackgroundTask {
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
-        if (0 != self.backgroundTaskID) {
-            return YES;
-        }
-        __weak typeof(self) weakSelf = self;
-        self.backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-            if (0 != weakSelf.backgroundTaskID) {
-                NSInteger taskid = weakSelf.backgroundTaskID;
-                weakSelf.backgroundTaskID = 0;
-                [[UIApplication sharedApplication] endBackgroundTask:taskid];
-            }
-        }];
-        return 0 != self.backgroundTaskID;
+    if (0 != self.backgroundTaskID) {
+        return YES;
     }
-    return NO;
+    __weak typeof(self) weakSelf = self;
+    self.backgroundTaskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        if (0 != weakSelf.backgroundTaskID) {
+            NSInteger taskid = weakSelf.backgroundTaskID;
+            weakSelf.backgroundTaskID = 0;
+            [[UIApplication sharedApplication] endBackgroundTask:taskid];
+        }
+    }];
+    return 0 != self.backgroundTaskID;
 }
 
 - (void)endBackgrondTask {

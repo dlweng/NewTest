@@ -72,6 +72,7 @@ static DLCloudDeviceManager *instance = nil;
     newDevice.mac = mac;
     newDevice.deviceName = peripheralName;
     newDevice.offlineTime = offlineTime;
+    newDevice.firstAdd = YES;
     [newDevice setupCoordinate:gps];
     [self addDeviceByCloudList:newDevice];
     [self.cloudDeviceList setValue:newDevice forKey:newDevice.mac];

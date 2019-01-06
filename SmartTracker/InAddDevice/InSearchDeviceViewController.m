@@ -34,9 +34,12 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
 
 @property (nonatomic, assign) InSearchViewType type;
 @property (weak, nonatomic) IBOutlet UIButton *confirmBtn;
+@property (weak, nonatomic) IBOutlet UIView *messageBodyView;
 @property (weak, nonatomic) IBOutlet UIView *searchBodyView;
 @property (weak, nonatomic) IBOutlet UIView *successBodyView;
 @property (weak, nonatomic) IBOutlet UIView *failedBodyView;
+@property (weak, nonatomic) IBOutlet UIView *lineView;
+
 @property (weak, nonatomic) IBOutlet UILabel *tryAagainLabel;
 @property (weak, nonatomic) IBOutlet UIView *phoneBodyView;
 @property (weak, nonatomic) IBOutlet UIImageView *successCardImageView;
@@ -46,6 +49,7 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *sucessCardWidthConstrain;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *failedCardWidthConstrain;
+@property (weak, nonatomic) IBOutlet UILabel *searchMessageLabel;
 @property (weak, nonatomic) IBOutlet UILabel *successMessageLabel;
 @property (weak, nonatomic) IBOutlet UILabel *failedMessageLabel;
 
@@ -87,18 +91,39 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
         [weakSelf animation];
     }];
     [[NSRunLoop currentRunLoop] addTimer:self.searchAnimationTimer forMode:NSRunLoopCommonModes];
+    
+    switch (common.deviceType) {
+        case InDeviceSmartCardHolder:
+        {
+            self.successCardImageView.image = [UIImage imageNamed:@"successCardHolder"];
+            self.failedCardImageView.image = [UIImage imageNamed:@"successCardHolder"];
+            self.searchCardImageView.image = [UIImage imageNamed:@"searchCardHolder"];
+            self.navigationItem.title = @"Adding Smart Card Holder";
+            self.searchMessageLabel.text = @"Searching for Smart Card Holder";
+            self.successMessageLabel.text = @"Pairing completed";
+            self.failedMessageLabel.text = @"Smart Card Holder not found";
+            break;
+        }
+        case InDeviceSmartCard:
+        {
+            self.successCardImageView.image = [UIImage imageNamed:@"failedCard"];
+            self.failedCardImageView.image = [UIImage imageNamed:@"failedCard"];
+            self.searchCardImageView.image = [UIImage imageNamed:@"searchCard"];
+            self.navigationItem.title = @"Adding Smart Card";
+            self.searchMessageLabel.text = @"Searching for Smart Card";
+            self.successMessageLabel.text = @"Pairing completed";
+            self.failedMessageLabel.text = @"Smart Card not found";
+            break;
+        }
+        default:
+            break;
+    }
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
-    self.topOptionViewHeightConstraint.constant = screenHeight / 4;
-    if (screenHeight == 568) {
-        // iphone 5, 4s
-        self.topOptionViewHeightConstraint.constant = screenHeight / 5;
-        self.successbodyViewHeightConstraint.constant = self.topOptionViewHeightConstraint.constant * 0.8;
-        self.failedBodyViewHeightConstraint.constant = self.topOptionViewHeightConstraint.constant * 0.8;
-    }
     self.type = InSearch;
     [self updateView];
     [self.searchAnimationTimer setFireDate:[NSDate distantFuture]];
@@ -115,84 +140,82 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
 - (void)updateView {
     CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
     NSString *message = @"";
-    switch (common.deviceType) {
-        case InDeviceSmartCardHolder:
-        {
-            self.successCardImageView.image = [UIImage imageNamed:@"successCardHolder"];
-            self.failedCardImageView.image = [UIImage imageNamed:@"successCardHolder"];
-            self.searchCardImageView.image = [UIImage imageNamed:@"searchCardHolder"];
-            self.navigationItem.title = @"Add a new smart card holder";
-            self.successMessageLabel.text = @"Found Smart Card Holder";
-            self.failedMessageLabel.text = @"No Smart Card Holder Found";
-            break;
-        }
-        case InDeviceSmartCard:
-        {
-            self.successCardImageView.image = [UIImage imageNamed:@"failedCard"];
-            self.failedCardImageView.image = [UIImage imageNamed:@"failedCard"];
-            self.searchCardImageView.image = [UIImage imageNamed:@"searchCard"];
-            self.navigationItem.title = @"Add a new smart card";
-            self.successMessageLabel.text = @"Found Smart Card";
-            self.failedMessageLabel.text = @"No Smart Card Found";
-            break;
-        }
-        default:
-            break;
-    }
-    
     if (self.type == InSearch) {
         self.searchBodyView.hidden = NO;
         self.successBodyView.hidden = YES;
         self.failedBodyView.hidden = YES;
         self.tryAagainLabel.hidden = YES;
         self.phoneBodyView.hidden = NO;
+        self.lineView.hidden = NO;
+        self.messageBodyView.hidden = NO;
         self.messageBodyViewHeightConstraing.constant = 120;
         self.phoneOptionViewHeightConstraint.constant = 151;
         self.confirmBtnTopConstraint.constant = screenHeight / 18.0;
-//        if (screenHeight == 568) {
-//            self.confirmBtnTopConstraint.constant = screenHeight / 35.0;
-//            self.phoneOptionViewHeightConstraint.constant = 140;
-//        }
+        self.topOptionViewHeightConstraint.constant = screenHeight / 4;
+        if (screenHeight == 568) {
+            // iphone 5, 4s
+            self.confirmBtnTopConstraint.constant = screenHeight / 35.0;
+            self.topOptionViewHeightConstraint.constant = screenHeight / 4.5;
+            self.successbodyViewHeightConstraint.constant = self.topOptionViewHeightConstraint.constant * 0.9;
+            self.failedBodyViewHeightConstraint.constant = self.topOptionViewHeightConstraint.constant * 0.9;
+        }
         [self.confirmBtn setTitle:@"Confirm" forState:UIControlStateNormal];
         self.titleLabel.text = @"Instructions:";
-        message = @"1. Make sure to turn on your phone's Bluetooth.\n2. Hold the button on the Smart card 3 sec until your hear a beep and the led starts flashing.\n3. Hold the Smart card close to your phone.";
+        if (common.deviceType == InDeviceSmartCardHolder) {
+            message = @"1. Ensure that Bluetooth is enabled.\n2. Place the Card Holder next to your phone.\n3. Press and hold the button on the Card Holder for 5 seconds until you hear a beep.\n4. Press the \"Confirm\" button below.";
+        }
+        else if(common.deviceType == InDeviceSmartCard){
+            message = @"1. Ensure that Bluetooth is enabled.\n2. Place the Card next to your phone.\n3. Press and hold the button on the Card for 5 seconds until you hear a beep and see the light flash.\n4. Press the \"Confirm\" button below.";
+        }
     }
     else if (self.type == InSuccess) {
         self.searchBodyView.hidden = YES;
         self.successBodyView.hidden = NO;
         self.failedBodyView.hidden = YES;
         self.tryAagainLabel.hidden = YES;
-        self.phoneBodyView.hidden = NO;
+        self.phoneBodyView.hidden = YES;
+        self.messageBodyView.hidden = YES;
+        self.lineView.hidden = YES;
         [self.confirmBtn setTitle:@"Confirm" forState:UIControlStateNormal];
-        self.messageBodyViewHeightConstraing.constant = 120;
-        self.phoneOptionViewHeightConstraint.constant = 151;
-        self.confirmBtnTopConstraint.constant = screenHeight / 18.0;
-//        if (screenHeight == 568) {
-//            self.confirmBtnTopConstraint.constant = screenHeight / 35.0;
-//            self.phoneOptionViewHeightConstraint.constant = 140;
-//        }
-        self.titleLabel.text = @"Successive instructions:";
-        message = @"1. Make sure to turn on your phone's Bluetooth.\n2. Hold the button on the Smart card until your hear a beep and the led starts flashing.\n3. Hold the Smart card close to your phone.";
+        self.messageBodyViewHeightConstraing.constant = 0;
+        self.phoneOptionViewHeightConstraint.constant = 0;
+        self.confirmBtnTopConstraint.constant = 0;
+        self.topOptionViewHeightConstraint.constant = screenHeight / 4;
+        if (screenHeight == 568) {
+            // iphone 5, 4s
+            self.successbodyViewHeightConstraint.constant = self.topOptionViewHeightConstraint.constant * 0.8;
+            self.failedBodyViewHeightConstraint.constant = self.topOptionViewHeightConstraint.constant * 0.8;
+        }
     }
     else if (self.type == InFailed) {
         self.searchBodyView.hidden = YES;
         self.successBodyView.hidden = YES;
         self.failedBodyView.hidden = NO;
-        self.tryAagainLabel.hidden = NO;
+        self.tryAagainLabel.hidden = YES;
         self.phoneBodyView.hidden = YES;
-        [self.confirmBtn setTitle:@"return" forState:UIControlStateNormal];
-        self.messageBodyViewHeightConstraing.constant = 120;
-        self.phoneOptionViewHeightConstraint.constant = 70;
+        self.messageBodyView.hidden = NO;
+        self.lineView.hidden = NO;
+        [self.confirmBtn setTitle:@"Try again" forState:UIControlStateNormal];
+        self.messageBodyViewHeightConstraing.constant = 230;
+        self.phoneOptionViewHeightConstraint.constant = 0;
         self.confirmBtnTopConstraint.constant = 0;
-        self.titleLabel.text = @"you can";
-        message = @"• Turn off and then turn on Bluetooth.\n• Hold the button on the Smart card and check if can hear a beep sound.\n• Near the Smart card to your phone";
+        self.titleLabel.text = @"Troubleshooting:";
+        if (common.deviceType == InDeviceSmartCardHolder) {
+            message = @"1. Ensure Bluetooth is enabled\n•  Turn off Bluetooth and re-enable it again.\n2. Ensure Card Holder is turned on\n• Hold the button on the Card for 5 seconds until you hear a beep.\n3. Ensure Card Holder is near your phone\n•  Place your Card Holder next to your phone.";
+        }
+        else if(common.deviceType == InDeviceSmartCard) {
+            message = @"1. Ensure Bluetooth is enabled\n•  Turn off Bluetooth and re-enable it again.\n2. Ensure Card Holder is turned on\n•  Press the button on the Card and check if the light flashes.\n•  If the light doesn't flash, hold the button on the Card for 5 seconds until you hear a beep and see the light flash.\n3. Ensure Card is near your phone\n•  Place your Card next to your phone.";
+        }
+        
     }
-    NSMutableParagraphStyle  *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    [paragraphStyle  setLineSpacing:5];
-    NSMutableAttributedString  *infoString = [[NSMutableAttributedString alloc] initWithString:message];
-    [infoString  addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [message length])];
-    // 设置Label要显示的text
-    [self.messageLabel  setAttributedText:infoString];
+    if (message.length > 0) {
+        NSMutableParagraphStyle  *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        [paragraphStyle  setLineSpacing:5];
+        NSMutableAttributedString  *infoString = [[NSMutableAttributedString alloc] initWithString:message];
+        [infoString  addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [message length])];
+        // 设置Label要显示的text
+        [self.messageLabel  setAttributedText:infoString];
+    }
 }
 
 - (IBAction)confirm {

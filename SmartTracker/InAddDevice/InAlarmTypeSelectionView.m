@@ -71,26 +71,26 @@
     if (self.alarmType == InDeviceAlert) {
         switch (indexPath.row) {
             case 1:
-                cell.textLabel.text = @"Equipment alarm 2";
+                cell.textLabel.text = @"Alert2";
                 break;
             case 2:
-                cell.textLabel.text = @"Equipment alarm 3";
+                cell.textLabel.text = @"Alert3";
                 break;
             default:
-                cell.textLabel.text = @"Equipment alarm 1";
+                cell.textLabel.text = @"Alert1";
                 break;
         }
     }
     else {
         switch (indexPath.row) {
             case 0:
-                cell.textLabel.text = @"Mobile phone alarm 1";
+                cell.textLabel.text = @"Alert1";
                 break;
             case 1:
-                cell.textLabel.text = @"Mobile phone alarm 2";
+                cell.textLabel.text = @"Alert2";
                 break;
             case 2:
-                cell.textLabel.text = @"Mobile phone alarm 3";
+                cell.textLabel.text = @"Alert3";
                 break;
             default:
                 break;

@@ -84,16 +84,16 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if (section == 0) {
-        return @"Device name";
+        return @"Device Name";
     }
     else if (section == 1) {
-        return @"Device alarm";
+        return @"Device Alert";
     }
     else if (section == 2) {
-        return @"Device alarm sound";
+        return @"Alert Tone";
     }
     else if (section == 3) {
-        return @"Device details";
+        return @"Device Details";
     }
     return @"";
 }
@@ -102,16 +102,16 @@
     NSString *sectionName = @"";
     switch (section) {
         case 0:
-            sectionName = @"    Device name";
+            sectionName = @"    Device Name";
             break;
         case 1:
-            sectionName = @"    Device alarm";
+            sectionName = @"    Device Alert";
             break;
         case 2:
-            sectionName = @"    Device alarm sound";
+            sectionName = @"    Alert Tone";
             break;
         case 3:
-            sectionName = @"    Device details";
+            sectionName = @"    Device Details";
             break;
         default:
             break;
@@ -136,23 +136,23 @@
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     else if(indexPath.section == 1) {
-        cell.textLabel.text = @"Disconnect alarm";
+        cell.textLabel.text = @"Separation Alert";
         cell.accessoryView = self.disconnectAlertBtn;
         NSNumber *disconnectAlert = self.device.lastData[DisconnectAlertKey];
         self.disconnectAlertBtn.on = disconnectAlert.boolValue;
     }
     else if (indexPath.section == 2 && indexPath.row == 0) {
-        cell.textLabel.text = @"Device alarm sound";
+        cell.textLabel.text = @"Device Alert Tone";
         NSNumber *alertMusic = self.device.lastData[AlertMusicKey];
         switch (alertMusic.integerValue) {
             case 2:
-                cell.detailTextLabel.text = @"Equipment alarm 2";
+                cell.detailTextLabel.text = @"Alert2";
                 break;
             case 3:
-                cell.detailTextLabel.text = @"Equipment alarm 3";
+                cell.detailTextLabel.text = @"Alert3";
                 break;
             default:
-                cell.detailTextLabel.text = @"Equipment alarm 1";
+                cell.detailTextLabel.text = @"Alert1";
                 break;
         }
     }
@@ -193,7 +193,7 @@
         NSInteger currentAlarmVoice = alertMusic.integerValue - 1;
         // 弹出选择框
         InAlarmType alertType = InDeviceAlert;
-        [InAlarmTypeSelectionView showAlarmTypeSelectionView:alertType title:@"select ringtone" currentAlarmVoice:currentAlarmVoice confirmHanler:^(NSInteger newAlertVoice) {
+        [InAlarmTypeSelectionView showAlarmTypeSelectionView:alertType title:@"Select device alert tone" currentAlarmVoice:currentAlarmVoice confirmHanler:^(NSInteger newAlertVoice) {
             [self.device selecteDiconnectAlertMusic:newAlertVoice];
             [self.tableView reloadData];
         }];
@@ -236,6 +236,10 @@
 
 - (void)device:(DLDevice *)device didUpdateData:(NSDictionary *)data {
     [self.tableView reloadData];
+}
+
+- (void)dealloc {
+    
 }
 
 

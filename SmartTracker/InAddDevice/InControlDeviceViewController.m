@@ -197,7 +197,7 @@
 
 - (void)setupControlDeviceBtnText {
     NSString *deviceName = self.device.deviceName;
-    [self.controlDeviceBtn setTitle:[NSString stringWithFormat:@"%@", deviceName] forState:UIControlStateNormal];
+    [self.controlDeviceBtn setTitle:[NSString stringWithFormat:@"Find %@", deviceName] forState:UIControlStateNormal];
 }
 
 - (void)addDeviceListView {
@@ -274,6 +274,9 @@
     // 2.新的方式，设置显示的范围
     //设置地图中的的经度、纬度
     CLLocationCoordinate2D center = self.mapView.userLocation.coordinate;
+    if (center.latitude == 0 && center.latitude == 0) {
+        center = common.currentLocation;
+    }
     //设置地图显示的范围
     MKCoordinateSpan span;
     //地图显示范围越小，细节越清楚；
@@ -414,13 +417,13 @@
             annotation = [[InAnnotation alloc] init];
             annotation.title = [NSString stringWithFormat:@"%@", device.deviceName];
             annotation.coordinate = device.coordinate;
-            __weak typeof(self) weakSelf = self;
-            [self reversGeocode:annotation.coordinate completion:^(NSString *str) {
-                annotation.subtitle = str;
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.75 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [weakSelf.mapView selectAnnotation:annotation animated:YES];
-                });
-            }];
+//            __weak typeof(self) weakSelf = self;
+//            [self reversGeocode:annotation.coordinate completion:^(NSString *str) {
+//                annotation.subtitle = str;
+//                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.75 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                    [weakSelf.mapView selectAnnotation:annotation animated:YES];
+//                });
+//            }];
             annotation.device = device;
             [self.deviceAnnotation setObject:annotation forKey:mac];
             [self.mapView addAnnotation:annotation];

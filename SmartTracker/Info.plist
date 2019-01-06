@@ -25,17 +25,17 @@
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>The app requires Bluetooth access to pair with the device.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>The app requires camera access to take photos.</string>
+	<string>The app requires access to the camera so that you can take photos with the app.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>he app requires location services access to obtain the location of the device.</string>
+	<string>The app requires location services access to obtain the location of the device.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>he app requires location services access to obtain the location of the device.</string>
+	<string>The app requires location services access to obtain the location of the device.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>he app requires location services access to obtain the location of the device.</string>
+	<string>The app requires location services access to obtain the location of the device.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>The app requires photo library access to store photos.</string>
+	<string>The app requires access to the photo library to save photos to and browse photos from your photo albums.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>The app requires photo library access to browse existing photos.</string>
+	<string>The app requires access to the photo library to save photos to and browse photos from your photo albums.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

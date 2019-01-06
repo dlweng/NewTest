@@ -97,6 +97,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)startSharkAnimation;
 - (void)stopSharkAnimation;
 
+- (void)saveFlashStatus:(BOOL)flashStatus;
+- (BOOL)flashStatus;
+
 @end
 
 NS_ASSUME_NONNULL_END

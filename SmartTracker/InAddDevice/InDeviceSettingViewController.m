@@ -18,6 +18,8 @@
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, assign) NSNumber *phoneAlertMusic;
+@property (nonatomic, strong) UISwitch *flashBtn;
+@property (nonatomic, strong) UISegmentedControl *segmentedControl;
 
 @end
 
@@ -31,8 +33,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.title = @"Device settings";
+    self.navigationItem.title = @"Setting";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_back"] style:UIBarButtonItemStylePlain target:self action:@selector(goBack)];
+    self.flashBtn = [[UISwitch alloc] init];
+    self.flashBtn.onTintColor = [InCommon uiBackgroundColor];
+    [self.flashBtn addTarget:self action:@selector(flashBtnDidClick:) forControlEvents:UIControlEventValueChanged];
+    self.segmentedControl = [[UISegmentedControl alloc] initWithItems:@[@"NEAR", @"FAR"]];
+    self.segmentedControl.tintColor = [InCommon uiBackgroundColor];
+    [self.segmentedControl addTarget:self action:@selector(segmentedControlValueChange:) forControlEvents:(UIControlEventValueChanged)];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -66,14 +74,16 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
-        case 0:
         case 1:
+            return 2;
+        case 0:
         case 2:
+        case 3:
             return 1;
         default:
             return 0;
@@ -84,11 +94,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
         case 0:
-            return @"Device alarm sound";
-        case 1:
-            return @"";
-//        case 2:
-//            return @"Device details";
+            return @"Alert Tone";
         default:
             return @"";
     }
@@ -98,14 +104,8 @@
     NSString *sectionName = @"";
     switch (section) {
         case 0:
-            sectionName = @"    Device alarm sound";
+            sectionName = @"    Alert Tone";
             break;
-        case 1:
-            sectionName = @"";
-            break;
-//        case 2:
-//            sectionName = @"    Device details";
-//            break;
         default:
             break;
     }
@@ -117,10 +117,10 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (section == 1 || section == 2) {
-        return 0;
+    if (section == 0) {
+        return 35;
     }
-    return 35;
+    return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -134,42 +134,46 @@
         case 0:
         {
             self.phoneAlertMusic = [[NSUserDefaults standardUserDefaults] objectForKey:PhoneAlertMusicKey];
-            cell.textLabel.text = @"Cell phone alarm sound";
+            cell.textLabel.text = @"Phone Alert Tone";
             switch (self.phoneAlertMusic.integerValue) {
                 case 2:
-                    cell.detailTextLabel.text = @"Mobile phone alarm 2";
+                    cell.detailTextLabel.text = @"Alert2";
                     break;
                 case 3:
-                    cell.detailTextLabel.text = @"Mobile phone alarm 3";
+                    cell.detailTextLabel.text = @"Alert3";
                     break;
                 default:
-                    cell.detailTextLabel.text = @"Mobile phone alarm 1";
+                    cell.detailTextLabel.text = @"Alert1";
                     break;
             }
             break;
         }
         case 1:
         {
+            switch (indexPath.row) {
+                case 0: {
+                    cell.textLabel.text = @"Flash Light";
+                    cell.accessoryView = self.flashBtn;
+                    self.flashBtn.on = [common flashStatus];
+                    break;
+                }
+                case 1:{
+                    cell.textLabel.text = @"Geofence";
+                    cell.accessoryView = self.segmentedControl;
+                    self.segmentedControl.selectedSegmentIndex = 0;
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case 2:
+        {
             cell.textLabel.text = @"Help Center";
             break;
         }
-//        case 2:
-//        {
-//            switch (indexPath.row) {
-//                case 0:
-//                    cell.textLabel.text = @"Device Address";
-//                    cell.detailTextLabel.text = self.device.mac;
-//                    break;
-//                case 1:
-//                    cell.textLabel.text = @"Firmware";
-//                    cell.detailTextLabel.text = self.device.firmware;
-//                    break;
-//                default:
-//                    break;
-//            }
-//            break;
-//        }
-        case 2:
+        case 3:
         {
             cell.textLabel.text = @"APP Version";
             cell.detailTextLabel.text = @"1.0.0";
@@ -195,7 +199,7 @@
         else {
             currentAlarmVoice = 0;
         }
-        title = @"Select ringone";
+        title = @"Select phone alert tone";
         // 弹出选择框
         __weak typeof(self) weakSelf = self;
         [InAlarmTypeSelectionView showAlarmTypeSelectionView:alertType title:title currentAlarmVoice:currentAlarmVoice confirmHanler:^(NSInteger newAlertVoice) {
@@ -208,6 +212,14 @@
 
 - (void)device:(DLDevice *)device didUpdateData:(NSDictionary *)data {
     [self.tableView reloadData];
+}
+
+- (void)flashBtnDidClick:(UISwitch *)btn {
+    [common saveFlashStatus:btn.isOn];
+}
+
+- (void)segmentedControlValueChange:(UISegmentedControl *)segmentedControl {
+    NSLog(@"segmentedControl = %zd", segmentedControl.selectedSegmentIndex);
 }
 
 @end

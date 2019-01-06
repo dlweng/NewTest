@@ -212,7 +212,7 @@
                                                 </constraints>
                                             </imageView>
                                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="failedCheck.png" translatesAutoresizingMaskIntoConstraints="NO" id="w8q-GC-upv">
-                                                <rect key="frame" x="224" y="48" width="22.5" height="18.5"/>
+                                                <rect key="frame" x="222.5" y="48" width="22.5" height="18.5"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="18.300000000000001" id="9X2-rE-orH"/>
                                                     <constraint firstAttribute="width" constant="22.300000000000001" id="dec-Bt-x2t"/>
@@ -233,7 +233,7 @@
                                             <constraint firstItem="45b-ea-PUg" firstAttribute="top" secondItem="agn-Nw-neF" secondAttribute="top" id="mpb-Tg-ymH"/>
                                             <constraint firstItem="I9Z-c1-c97" firstAttribute="centerX" secondItem="agn-Nw-neF" secondAttribute="centerX" id="rvT-wa-NVp"/>
                                             <constraint firstAttribute="bottom" secondItem="I9Z-c1-c97" secondAttribute="bottom" id="uDm-54-whO"/>
-                                            <constraint firstItem="w8q-GC-upv" firstAttribute="leading" secondItem="45b-ea-PUg" secondAttribute="trailing" constant="-11" id="zfV-Ww-pVF"/>
+                                            <constraint firstItem="w8q-GC-upv" firstAttribute="leading" secondItem="45b-ea-PUg" secondAttribute="trailing" constant="-12.5" id="zfV-Ww-pVF"/>
                                         </constraints>
                                     </view>
                                 </subviews>
@@ -265,15 +265,15 @@
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="120"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Successive instructions" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kXk-nB-kjf" userLabel="messsgeLabel">
-                                                <rect key="frame" x="24" y="33" width="327" height="12"/>
+                                                <rect key="frame" x="24" y="36" width="327" height="12"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                                 <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Successive instructions" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v3P-VH-WyQ" userLabel="titleLabel">
-                                                <rect key="frame" x="24" y="8" width="329" height="17"/>
+                                                <rect key="frame" x="24" y="8" width="329" height="20"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="17" id="eib-5e-Zlt"/>
+                                                    <constraint firstAttribute="height" constant="20" id="eib-5e-Zlt"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                 <nil key="highlightedColor"/>
@@ -397,15 +397,18 @@
                         <outlet property="failedCardImageView" destination="45b-ea-PUg" id="1rT-bG-QRp"/>
                         <outlet property="failedCardWidthConstrain" destination="rYr-mw-2Th" id="6fP-YC-uVQ"/>
                         <outlet property="failedMessageLabel" destination="I9Z-c1-c97" id="JXz-w5-098"/>
+                        <outlet property="lineView" destination="09K-IB-uFI" id="fbt-88-AER"/>
+                        <outlet property="messageBodyView" destination="GX6-bo-RZj" id="uwt-xF-pT5"/>
                         <outlet property="messageBodyViewHeightConstraing" destination="AuE-1t-Ufl" id="rPs-KF-LEZ"/>
                         <outlet property="messageLabel" destination="kXk-nB-kjf" id="hca-Y1-1P2"/>
                         <outlet property="phoneBodyView" destination="HJT-Iz-Q9d" id="ARq-Kb-j3p"/>
                         <outlet property="phoneOptionViewHeightConstraint" destination="g56-OE-F4t" id="9uP-4a-DzB"/>
                         <outlet property="searchBodyView" destination="lXf-D4-4hu" id="t0s-2S-x3J"/>
                         <outlet property="searchCardImageView" destination="sRR-Oi-oO4" id="0cV-Em-MHR"/>
+                        <outlet property="searchMessageLabel" destination="FDP-hZ-jfd" id="cIg-KR-U6H"/>
                         <outlet property="successBodyView" destination="uMd-fn-Qr3" id="TJH-Sw-5gV"/>
                         <outlet property="successCardImageView" destination="1r9-5Z-lot" id="4kY-8E-xM6"/>
-                        <outlet property="successMessageLabel" destination="O5d-f5-C8l" id="Pv1-uc-bi5"/>
+                        <outlet property="successMessageLabel" destination="O5d-f5-C8l" id="4rh-vB-avz"/>
                         <outlet property="successbodyViewHeightConstraint" destination="erA-Z0-wO3" id="3M8-fT-tFa"/>
                         <outlet property="sucessCardWidthConstrain" destination="Vjv-Wi-UjD" id="g3e-P1-dZK"/>
                         <outlet property="titleLabel" destination="v3P-VH-WyQ" id="eAo-yc-j0Y"/>
