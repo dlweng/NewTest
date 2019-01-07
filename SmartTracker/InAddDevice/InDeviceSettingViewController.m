@@ -40,7 +40,8 @@
     [self.flashBtn addTarget:self action:@selector(flashBtnDidClick:) forControlEvents:UIControlEventValueChanged];
     self.segmentedControl = [[UISegmentedControl alloc] initWithItems:@[@"NEAR", @"FAR"]];
     self.segmentedControl.tintColor = [InCommon uiBackgroundColor];
-    [self.segmentedControl addTarget:self action:@selector(segmentedControlValueChange:) forControlEvents:(UIControlEventValueChanged)];
+    self.segmentedControl.userInteractionEnabled = NO;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceRSSIChange:) name:DeviceRSSIChangeNotification object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -58,6 +59,10 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     self.device.delegate = self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:DeviceRSSIChangeNotification object:nil];
 }
 
 - (void)saveNewDeviceName:(NSString *)newDeviceName {
@@ -160,7 +165,12 @@
                 case 1:{
                     cell.textLabel.text = @"Geofence";
                     cell.accessoryView = self.segmentedControl;
-                    self.segmentedControl.selectedSegmentIndex = 0;
+                    if (self.device.rssi.intValue >= -56) {
+                        self.segmentedControl.selectedSegmentIndex = 0;
+                    }
+                    else {
+                        self.segmentedControl.selectedSegmentIndex = 1;
+                    }
                     break;
                 }
                 default:
@@ -218,8 +228,11 @@
     [common saveFlashStatus:btn.isOn];
 }
 
-- (void)segmentedControlValueChange:(UISegmentedControl *)segmentedControl {
-    NSLog(@"segmentedControl = %zd", segmentedControl.selectedSegmentIndex);
+- (void)deviceRSSIChange:(NSNotification *)noti {
+    DLDevice *device = noti.object;
+    if (device.mac == self.device.mac) {
+        [self.tableView reloadData];
+    }
 }
 
 @end
