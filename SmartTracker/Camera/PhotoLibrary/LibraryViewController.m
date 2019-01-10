@@ -73,6 +73,7 @@ static NSString * const kReuseIdentifierOfMainImageCell = @"kReuseIdentifierOfMa
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(goBack)];
     self.navigationItem.title = @"Photo Library";
+    [self detectionPhotoState];
 }
 
 
@@ -82,6 +83,27 @@ static NSString * const kReuseIdentifierOfMainImageCell = @"kReuseIdentifierOfMa
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
+}
+
+// 解决第一次访问授权提问的时候，不能加载出图片的问题
+- (void)detectionPhotoState
+{
+    PHAuthorizationStatus authStatus = [PHPhotoLibrary authorizationStatus];
+    //用户尚未授权
+    if (authStatus == PHAuthorizationStatusNotDetermined)
+    {
+        __weak typeof(self) weakSelf = self;
+        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+            if (status == PHAuthorizationStatusAuthorized)
+            {
+                NSLog(@"相册已授权， %@", [NSThread currentThread]);
+                weakSelf.dataArray = [weakSelf.class getPHAssets];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.collectionView reloadData];
+                });
+            }
+        }];
+    }
 }
 
 #pragma mark - <UICollectionViewDataSource, UICollectionViewDelegate>

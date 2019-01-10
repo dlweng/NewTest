@@ -99,7 +99,6 @@
     
     // 设置状态栏和导航栏  设置状态栏是因为在IPhone5s上状态栏会消失
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    [InCommon setNavgationBar:nav.navigationBar];
     NSMutableDictionary *titleTextAttributes = [NSMutableDictionary dictionary];
     titleTextAttributes[NSForegroundColorAttributeName] = [UIColor whiteColor];
     nav.navigationBar.titleTextAttributes = titleTextAttributes;
