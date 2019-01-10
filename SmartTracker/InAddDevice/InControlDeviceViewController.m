@@ -417,13 +417,13 @@
             annotation = [[InAnnotation alloc] init];
             annotation.title = [NSString stringWithFormat:@"%@", device.deviceName];
             annotation.coordinate = device.coordinate;
-//            __weak typeof(self) weakSelf = self;
-//            [self reversGeocode:annotation.coordinate completion:^(NSString *str) {
-//                annotation.subtitle = str;
-//                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.75 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//                    [weakSelf.mapView selectAnnotation:annotation animated:YES];
-//                });
-//            }];
+            __weak typeof(self) weakSelf = self;
+            [self reversGeocode:annotation.coordinate completion:^(NSString *str) {
+                annotation.subtitle = str;
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.75 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [weakSelf.mapView selectAnnotation:annotation animated:YES];
+                });
+            }];
             annotation.device = device;
             [self.deviceAnnotation setObject:annotation forKey:mac];
             [self.mapView addAnnotation:annotation];
@@ -439,20 +439,21 @@
  *  反地理编码: 把经纬度转换地名
  */
 - (void)reversGeocode:(CLLocationCoordinate2D)coordinate completion:(void (^)(NSString *))completion{
+    
     //  1. 取出经纬度信息
     NSString *latitudeStr = [NSString stringWithFormat:@"%f", coordinate.latitude];
     NSString *longitudeStr = [NSString stringWithFormat:@"%f", coordinate.longitude];
     
     //  创建位置对象
-    CLLocation *location = [[CLLocation alloc] initWithLatitude:latitudeStr.doubleValue longitude:longitudeStr.doubleValue];
-    
+    CLLocation *location = [[CLLocation alloc] initWithLatitude:coordinate.latitude longitude:coordinate.longitude];
+    NSLog(@"location = %@,", location);
     //  1. 创建地理编码器
     CLGeocoder *geocoder = [[CLGeocoder alloc] init];
     //  2. 反地理编码,
     [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
-        
+        NSLog(@"地址转换, placemarks = %@, error = %@", placemarks, error);
         for (CLPlacemark *placemark in placemarks) {
-            NSMutableString *address = [NSMutableString stringWithString:@"Near "];
+            NSMutableString *address = [NSMutableString stringWithString:@"Last seen "];
             if (placemark.subThoroughfare.length > 0) {
                 [address appendFormat:@"%@ ", placemark.subThoroughfare];
             }

@@ -201,7 +201,7 @@ typedef NS_ENUM(NSInteger, InSearchViewType) {
         self.confirmBtnTopConstraint.constant = 0;
         self.titleLabel.text = @"Troubleshooting:";
         if (common.deviceType == InDeviceSmartCardHolder) {
-            message = @"1. Ensure Bluetooth is enabled\n•  Turn off Bluetooth and re-enable it again.\n2. Ensure Card Holder is turned on\n• Hold the button on the Card for 5 seconds until you hear a beep.\n3. Ensure Card Holder is near your phone\n•  Place your Card Holder next to your phone.";
+            message = @"1. Ensure Bluetooth is enabled\n•  Turn off Bluetooth and re-enable it again.\n2. Ensure Card Holder is turned on\n• Hold the button on the Card Holder for 5 seconds until you hear a beep.\n3. Ensure Card Holder is near your phone\n•  Place your Card Holder next to your phone.";
         }
         else if(common.deviceType == InDeviceSmartCard) {
             message = @"1. Ensure Bluetooth is enabled\n•  Turn off Bluetooth and re-enable it again.\n2. Ensure Card Holder is turned on\n•  Press the button on the Card and check if the light flashes.\n•  If the light doesn't flash, hold the button on the Card for 5 seconds until you hear a beep and see the light flash.\n3. Ensure Card is near your phone\n•  Place your Card next to your phone.";

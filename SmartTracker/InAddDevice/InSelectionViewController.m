@@ -33,7 +33,7 @@
     self.arr = @[@{@"image": @"SmartCardHolder", @"title": @"Smart Card Holder"},
                  @{@"image": @"SmartCard", @"title": @"Smart Card"}];
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
-    self.navigationItem.title = @"Add a new smart card";
+    self.navigationItem.title = @"Add smart devices";
     if ([DLCloudDeviceManager sharedInstance].cloudDeviceList.count > 0) {
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"icon_back"] style:UIBarButtonItemStylePlain target:self action:@selector(goBack)];
     }

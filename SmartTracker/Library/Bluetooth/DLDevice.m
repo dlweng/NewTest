@@ -747,13 +747,8 @@
     NSInteger day = comp.day;
     NSInteger hour = comp.hour;
     NSInteger minute = comp.minute;
-    NSInteger second = comp.second;
-    if (year == 0 && mouth == 0 && day == 0 && hour == 0 && minute == 0) {
-        _offlineTimeInfo = [NSString stringWithFormat:@"Last seen %zd seconds ago", second];
-        return;
-    }
     if (year == 0 && mouth == 0 && day == 0 && hour == 0) {
-        _offlineTimeInfo = [NSString stringWithFormat:@"Last seen %zd minutes %zd seconds ago", minute ,second];
+        _offlineTimeInfo = [NSString stringWithFormat:@"Last seen %zd minutes ago", minute];
         return;
     }
     if (year == 0 && mouth == 0 && day == 0) {
