@@ -19,7 +19,6 @@
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, assign) NSNumber *phoneAlertMusic;
 @property (nonatomic, strong) UISwitch *flashBtn;
-@property (nonatomic, strong) UISegmentedControl *segmentedControl;
 
 @end
 
@@ -38,10 +37,6 @@
     self.flashBtn = [[UISwitch alloc] init];
     self.flashBtn.onTintColor = [InCommon uiBackgroundColor];
     [self.flashBtn addTarget:self action:@selector(flashBtnDidClick:) forControlEvents:UIControlEventValueChanged];
-    self.segmentedControl = [[UISegmentedControl alloc] initWithItems:@[@"NEAR", @"FAR"]];
-    self.segmentedControl.tintColor = [InCommon uiBackgroundColor];
-    self.segmentedControl.userInteractionEnabled = NO;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceRSSIChange:) name:DeviceRSSIChangeNotification object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -59,10 +54,6 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     self.device.delegate = self;
-}
-
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:DeviceRSSIChangeNotification object:nil];
 }
 
 - (void)saveNewDeviceName:(NSString *)newDeviceName {
@@ -85,7 +76,6 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 1:
-            return 2;
         case 0:
         case 2:
         case 3:
@@ -162,17 +152,6 @@
                     self.flashBtn.on = [common flashStatus];
                     break;
                 }
-                case 1:{
-                    cell.textLabel.text = @"Geofence";
-                    cell.accessoryView = self.segmentedControl;
-                    if (self.device.rssi.intValue >= -56) {
-                        self.segmentedControl.selectedSegmentIndex = 0;
-                    }
-                    else {
-                        self.segmentedControl.selectedSegmentIndex = 1;
-                    }
-                    break;
-                }
                 default:
                     break;
             }
@@ -226,13 +205,6 @@
 
 - (void)flashBtnDidClick:(UISwitch *)btn {
     [common saveFlashStatus:btn.isOn];
-}
-
-- (void)deviceRSSIChange:(NSNotification *)noti {
-    DLDevice *device = noti.object;
-    if (device.mac == self.device.mac) {
-        [self.tableView reloadData];
-    }
 }
 
 @end
