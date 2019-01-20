@@ -155,6 +155,7 @@
     if (status == kCLAuthorizationStatusAuthorizedAlways) {
         NSLog(@"授权在前台后台都可进行定位");
         [self setupLocationData];
+        [self startiBeaconListen];
     } else if (status == kCLAuthorizationStatusAuthorizedWhenInUse) {
         NSLog(@"授权只允许在使用期间定位");
         [self setupLocationData];
@@ -211,7 +212,7 @@
 }
 - (void)startiBeaconListen {
     if (![self isMonitoriBeacon]) {
-        NSLog(@"设备不可以使用iBeacon，去监听");
+        NSLog(@"设备不可以使用iBeacon");
         return;
     }
     NSLog(@"设备可以使用iBeacon，去监听");
