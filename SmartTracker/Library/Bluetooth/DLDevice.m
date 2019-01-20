@@ -665,10 +665,12 @@
                     [common sendLocalNotification:[NSString stringWithFormat:@"%@ disconnects from iPhone.", self.deviceName]];
                 }
                 self.isOfflineSounding = YES;
-                self.isSearchPhone = NO;
                 NSLog(@"播放离线音乐");
             }
         }
+//        if (self.isSearchPhone) {
+//            [[NSNotificationCenter defaultCenter] postNotificationName:DeviceSearchPhoneNotification object:self userInfo:@{@"Device":self}];
+//        }
     }
     
    
@@ -954,6 +956,7 @@
 - (void)setIsSearchPhone:(BOOL)isSearchPhone {
     _isSearchPhone = isSearchPhone;
     if (isSearchPhone) {
+        NSLog(@"打开查找手机音乐： isSearchPhone = %d", isSearchPhone);
         [self playSearchPhoneSound];
     }
     else {

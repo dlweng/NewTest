@@ -228,7 +228,7 @@
 - (CLBeaconRegion *)iBeaconRegion {
     if (!_iBeaconRegion) {
         NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:@"704F6FEE-A8A0-475B-91C2-7A2ECC1CE8A2"];
-        _iBeaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID major:16 minor:17 identifier:@"com.innwaytech.innway"];
+        _iBeaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID major:16 minor:17 identifier:@"com.smarttech.smart"];
         _iBeaconRegion.notifyOnEntry = YES;
         _iBeaconRegion.notifyOnExit = YES;
     }
