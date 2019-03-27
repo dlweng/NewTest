@@ -250,7 +250,7 @@ static DLCloudDeviceManager *instance = nil;
         for (NSDictionary *dic in cloudList) {
             NSString *mac = [dic stringValueForKey:@"mac" defaultValue:@""];
             if ([mac isEqualToString:device.mac]) {
-                removeObj = obj;
+                removeObj = dic;
                 obj = [NSMutableDictionary dictionaryWithDictionary:dic];
             }
         }
@@ -260,6 +260,7 @@ static DLCloudDeviceManager *instance = nil;
             }
             [cloudList removeObject:removeObj];
             [cloudList addObject:obj];
+            NSLog(@"更新设备名称后的列表：%@", cloudList);
         }
         [defaults setValue:[cloudList copy] forKey:@"cloudDeviceList"];
         [defaults synchronize];

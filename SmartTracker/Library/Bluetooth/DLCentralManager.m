@@ -414,7 +414,7 @@ static pthread_rwlock_t _connectDeviceEventHandler = PTHREAD_RWLOCK_INITIALIZER;
                 NSDictionary *eventDic = weakSelf.connectDeviceEventDict[periperalUUID];
                 time_t startTime = [eventDic integerValueForKey:connectStartTimeKey defaultValue:time(NULL)];
                 time_t exeTime = time(NULL) - startTime;
-                if (exeTime >= 5) {
+                if (exeTime >= 4) {
                     // 到了超时时间，还没有回调，回调连接超时
                     DidConnectToDeviceEvent event = eventDic[connectCallbackKey];
                     CBPeripheral *peripheral = eventDic[connectPeripheralKey];

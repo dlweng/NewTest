@@ -156,7 +156,7 @@
         }
         if ([characteristic.UUID.UUIDString isEqualToString:ntfUUID.UUIDString]) {
             self.isDiscoverAllCharacter++;
-            [self notification:DLServiceUUID characteristicUUID:DLNTFCharacteristicUUID p:self.peripheral on:YES];
+            [self notification:DLServiceUUID characteristicUUID:DLNTFCharacteristicUUID p:peripheral on:YES];
         }
         if (self.isDiscoverAllCharacter == 2) {
             __weak typeof(self) weakSelf = self;
@@ -330,11 +330,11 @@
         NSString *alertStatus = [payload substringWithRange:NSMakeRange(0, 2)];
         if (!alertStatus.boolValue) {
             _isSearchDevice = NO;
-//            NSLog(@"接收到设备状态通知，关闭查找设备");
+            NSLog(@"接收到设备状态通知，关闭查找设备");
         }
         else {
             _isSearchDevice = YES;
-//            NSLog(@"接收到设备状态通知，打开查找设备");
+            NSLog(@"接收到设备状态通知，打开查找设备");
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:DeviceSearchDeviceAlertNotification object:self userInfo:@{@"device":self}];
     }
@@ -385,6 +385,7 @@
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
+    NSLog(@"接收读响应数据: peripheral = %@, self.peripheral = %@", peripheral, self.peripheral);
     if ([peripheral.identifier.UUIDString isEqualToString:self.peripheral.identifier.UUIDString]) {
         NSLog(@"mac:%@, 接收读响应数据, peripheral：%@,  characteristic = %@, error = %@", self.mac, self.peripheral, characteristic.value, error);
         // 读硬件版本号
